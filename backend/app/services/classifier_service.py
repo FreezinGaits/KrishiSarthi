@@ -579,8 +579,17 @@ def _demo_classify(filename: str, request_id: str) -> DiagnoseImageResponse:
             break
 
     if matched_classes is None:
-        disease_keys = [k for k in DISEASE_DATABASE.keys() if "healthy" not in k.lower()]
-        matched_classes = random.sample(disease_keys, min(3, len(disease_keys)))
+        # Fallback: Don't guess randomly. Be honest.
+        logger.warning("[%s] DEMO: No keywords in filename '%s', returning unidentified", request_id, filename)
+        return DiagnoseImageResponse(
+            predictions=[],
+            top_disease="Unidentified (Demo Mode)",
+            top_confidence=0.0,
+            treatment="AI service unavailable (Quota Exceeded) and filename not recognized. "
+                      "Please use a valid API key for real diagnosis, or rename your image to include a crop name (e.g., 'tomato_blight.jpg') for demo mode.",
+            pesticide="None",
+            model_version="v1.0-demo-fallback"
+        )
 
     non_healthy = [c for c in matched_classes if "healthy" not in c.lower()]
     primary_key = random.choice(non_healthy) if non_healthy else matched_classes[0]
