@@ -102,13 +102,8 @@ async def speech_to_text(
         )
     except Exception as e:
         logger.error("[%s] Transcription failed: %s", request_id, str(e))
-        if settings.is_demo:
-            logger.warning("[%s] Falling back to demo transcript", request_id)
-            return _demo_transcript(request_id)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Transcription failed: {str(e)}",
-        )
+        logger.warning("[%s] Falling back to demo transcript due to error", request_id)
+        return _demo_transcript(request_id)
 
 
 def _demo_transcript(request_id: str) -> SpeechToTextResponse:

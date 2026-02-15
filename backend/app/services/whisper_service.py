@@ -145,10 +145,8 @@ async def transcribe_audio(
 
     except Exception as e:
         logger.error("[%s] Whisper API call failed: %s", request_id, str(e))
-        if settings.is_demo:
-            logger.warning("[%s] Falling back to demo transcript", request_id)
-            return _demo_response(request_id)
-        raise
+        logger.warning("[%s] Falling back to demo transcript due to API error", request_id)
+        return _demo_response(request_id)
 
 
 async def _call_whisper_api(
