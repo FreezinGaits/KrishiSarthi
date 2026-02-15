@@ -1,0 +1,153 @@
+[
+  {
+    "id": "wheat_brown_rust",
+    "disease_name": "Wheat Brown Rust / Leaf Rust",
+    "hindi_name": "गेहूं भूरा गेरुआ / पत्ती गेरुआ",
+    "scientific_name": "Puccinia triticina",
+    "crop": "Wheat",
+    "symptoms": [
+      "Small, round, orange-brown pustules scattered on upper leaf surface",
+      "Pustules are lighter colored than stem rust",
+      "Pustules release rusty-orange spore powder when rubbed",
+      "Infected leaves dry prematurely",
+      "Grain shriveling if infection is severe during grain filling"
+    ],
+    "cause": "Fungus Puccinia triticina. Wind-borne urediniospores can travel hundreds of kilometers. Favored by moderate temperatures (15-25°C) and high humidity. Most common wheat rust in Punjab and Haryana.",
+    "treatment": [
+      "Apply Propiconazole 25% EC at 1ml/litre of water",
+      "Spray at first sign of orange-brown pustules",
+      "Repeat after 15 days if symptoms persist",
+      "Best spray time: evening (4-6 PM) for better absorption",
+      "Ensure complete coverage of all leaves"
+    ],
+    "prevention": [
+      "Plant resistant varieties: PBW 343, HD 2967, WH 1105 (PAU recommended)",
+      "Monitor fields from mid-January to March",
+      "Early sowing (late October) reduces rust risk",
+      "Avoid excessive nitrogen fertilizer",
+      "Remove volunteer wheat plants from field margins"
+    ],
+    "recommended_pesticide": {
+      "name": "Propiconazole 25% EC",
+      "dosage": "1 ml per litre of water (500 ml per acre)",
+      "spray_interval": "Single spray, repeat after 15 days if needed",
+      "waiting_period": "35 days before harvest"
+    },
+    "severity": "high",
+    "spread_speed": "fast",
+    "yield_loss_potential": "20-40%"
+  },
+  {
+    "id": "wheat_yellow_rust",
+    "disease_name": "Wheat Yellow Rust / Stripe Rust",
+    "hindi_name": "गेहूं पीला गेरुआ / धारी गेरुआ",
+    "scientific_name": "Puccinia striiformis f. sp. tritici",
+    "crop": "Wheat",
+    "symptoms": [
+      "Yellow-orange pustules arranged in distinct stripes along leaf veins",
+      "Stripes run parallel to the leaf midrib",
+      "More prominent on young, upper leaves",
+      "Severe infection causes complete leaf yellowing and death",
+      "Grain shriveling and significant yield loss if untreated"
+    ],
+    "cause": "Fungus Puccinia striiformis. The MOST damaging wheat rust. Favored by cool temperatures (10-15°C) with dew or light rain. Can spread rapidly and devastate entire fields within weeks.",
+    "treatment": [
+      "URGENT: Apply Propiconazole 25% EC at 1ml/litre IMMEDIATELY",
+      "This is a yield-devastating disease — every day of delay increases crop loss",
+      "Spray entire field, not just visible patches",
+      "A single well-timed spray can save 15-20 quintal/hectare",
+      "Contact nearest KVK or agricultural university IMMEDIATELY"
+    ],
+    "prevention": [
+      "Plant resistant varieties recommended by PAU/IARI",
+      "Early sowing helps avoid peak infection period",
+      "Regular field monitoring from December to February",
+      "Balanced fertilization — avoid excess nitrogen",
+      "Report outbreaks to district agriculture officer"
+    ],
+    "recommended_pesticide": {
+      "name": "Propiconazole 25% EC",
+      "dosage": "1 ml per litre of water (500 ml per acre)",
+      "spray_interval": "Single spray at first symptom, may repeat once",
+      "waiting_period": "35 days before harvest"
+    },
+    "severity": "critical",
+    "spread_speed": "very_fast",
+    "yield_loss_potential": "40-100%"
+  },
+  {
+    "id": "wheat_karnal_bunt",
+    "disease_name": "Wheat Karnal Bunt",
+    "hindi_name": "गेहूं कर्नाल बंट / आंशिक बंट",
+    "scientific_name": "Tilletia indica",
+    "crop": "Wheat",
+    "symptoms": [
+      "Partially converted grain kernels — only part of grain turns black",
+      "Infected grains emit strong fishy/rotten smell when crushed",
+      "Black powdery mass (teliospores) visible when grain is broken",
+      "Mostly affects ear/spike, not the leaves",
+      "Often noticed only at harvest",
+      "Usually 1-5% of grains affected in a spike"
+    ],
+    "cause": "Fungus Tilletia indica (syn. Neovossia indica). Named after Karnal city, Haryana where first identified. Soil-borne. Favored by cool, humid weather during ear heading. India is the country of origin.",
+    "treatment": [
+      "No effective chemical treatment once symptoms appear",
+      "Grade and separate infected grain lots",
+      "Do NOT use infected grain for seed",
+      "Seed treatment with Carboxin 75% WP at 2.5g/kg seed for next season",
+      "Deep ploughing after harvest to bury spores"
+    ],
+    "prevention": [
+      "Use certified, bunt-free seed",
+      "Seed treatment with Carboxin or Thiram before sowing",
+      "Avoid very late sowing",
+      "Deep ploughing in summer to kill soil-borne spores",
+      "Plant resistant/tolerant varieties"
+    ],
+    "recommended_pesticide": {
+      "name": "Carboxin 75% WP (Seed Treatment)",
+      "dosage": "2.5 grams per kg of seed",
+      "spray_interval": "Pre-sowing seed treatment only",
+      "waiting_period": "Not applicable"
+    },
+    "severity": "moderate",
+    "spread_speed": "slow",
+    "yield_loss_potential": "5-20% (quality loss more than quantity)"
+  },
+  {
+    "id": "wheat_powdery_mildew",
+    "disease_name": "Wheat Powdery Mildew",
+    "hindi_name": "गेहूं चूर्णिल आसिता",
+    "scientific_name": "Blumeria graminis f. sp. tritici",
+    "crop": "Wheat",
+    "symptoms": [
+      "White to grey powdery fungal growth on upper leaf surface",
+      "Can spread to stems and ears in severe cases",
+      "Leaves may yellow and die prematurely under heavy infection",
+      "Reduced photosynthesis and plant vigor",
+      "Small black dots (cleistothecia) may appear in older lesions"
+    ],
+    "cause": "Fungus Blumeria graminis f. sp. tritici. Spread by wind-borne conidia. Favored by moderate temperatures (15-22°C), high humidity, and dense plant canopy. Common in irrigated, well-fertilized fields.",
+    "treatment": [
+      "Apply Propiconazole 25% EC at 1ml/litre",
+      "Or Carbendazim 50% WP at 1g/litre",
+      "Spray at first signs of white powdery patches",
+      "Improve air circulation by avoiding excessive irrigation"
+    ],
+    "prevention": [
+      "Use resistant varieties",
+      "Balanced nitrogen fertilization",
+      "Avoid excess irrigation during cool weather",
+      "Maintain proper plant spacing"
+    ],
+    "recommended_pesticide": {
+      "name": "Propiconazole 25% EC",
+      "dosage": "1 ml per litre of water",
+      "spray_interval": "Single spray at first symptoms",
+      "waiting_period": "35 days before harvest"
+    },
+    "severity": "moderate",
+    "spread_speed": "moderate",
+    "yield_loss_potential": "10-25%"
+  }
+]

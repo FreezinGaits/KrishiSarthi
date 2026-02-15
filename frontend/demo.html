@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌾 Krishi-Sarthi — AI कृषि सहायक</title>
+    <meta name="description" content="Voice-first agentic AI assistant for farmers — crop disease diagnosis, treatment recommendations, and nearest vendor discovery.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+    <!-- ── Header ──────────────────────────────── -->
+    <header class="app-header">
+        <div class="header-left">
+            <span class="logo">🌾</span>
+            <div>
+                <h1>Krishi-Sarthi</h1>
+                <p class="subtitle">AI कृषि सहायक • Smart Farming Assistant</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="demo-badge" id="demoBadge">DEMO MODE</span>
+            <span class="status-dot" id="statusDot" title="Backend status"></span>
+        </div>
+    </header>
+
+    <!-- ── Main Content ────────────────────────── -->
+    <main class="app-main">
+        <!-- Chat Panel -->
+        <section class="chat-panel">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome message -->
+                <div class="message bot-message">
+                    <div class="message-avatar">🌿</div>
+                    <div class="message-content">
+                        <p><strong>🙏 नमस्ते! मैं कृषि-सारथी हूँ।</strong></p>
+                        <p>मैं आपकी मदद कर सकता हूँ:</p>
+                        <ul>
+                            <li>🌱 <strong>फसल रोग पहचान</strong> — फोटो भेजें</li>
+                            <li>🎤 <strong>आवाज़ में बात करें</strong> — माइक दबाएं</li>
+                            <li>📍 <strong>नज़दीकी दुकान</strong> — कीटनाशक दुकान ढूंढें</li>
+                        </ul>
+                        <p class="hint">Try: "Meri tamatar ki fasal mein kale dhabbe hain"</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-area">
+                <div class="input-actions-top">
+                    <button class="action-btn" id="imageBtn" title="Upload crop image">
+                        📷 फोटो
+                    </button>
+                    <button class="action-btn" id="locationBtn" title="Share location">
+                        📍 Location
+                    </button>
+                </div>
+                <div class="input-row">
+                    <button class="mic-btn" id="micBtn" title="Hold to speak">
+                        🎤
+                    </button>
+                    <input type="text" class="chat-input" id="chatInput" 
+                           placeholder="अपना सवाल टाइप करें / Type your question..."
+                           autocomplete="off">
+                    <button class="send-btn" id="sendBtn" title="Send">
+                        ➤
+                    </button>
+                </div>
+                <div class="recording-indicator" id="recordingIndicator">
+                    <span class="pulse-dot"></span>
+                    🎙️ Recording... बोलिए...
+                </div>
+            </div>
+
+            <!-- Hidden file input -->
+            <input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp" hidden>
+        </section>
+
+        <!-- Side Panel (Diagnosis / Vendors) -->
+        <aside class="side-panel" id="sidePanel">
+            <div class="side-panel-tabs">
+                <button class="tab-btn active" data-tab="diagnosis">🔬 Diagnosis</button>
+                <button class="tab-btn" data-tab="vendors">📍 Vendors</button>
+            </div>
+
+            <!-- Diagnosis Tab -->
+            <div class="tab-content active" id="diagnosisTab">
+                <div class="empty-state" id="diagnosisEmpty">
+                    <span class="empty-icon">🔬</span>
+                    <p>Upload a crop image to get disease diagnosis</p>
+                    <p class="hint">फसल की फोटो भेजें</p>
+                </div>
+                <div class="diagnosis-card hidden" id="diagnosisCard">
+                    <div class="diagnosis-header">
+                        <h3 id="diseaseName">—</h3>
+                        <span class="confidence-badge" id="confidenceBadge">0%</span>
+                    </div>
+                    <div class="diagnosis-body">
+                        <div class="diagnosis-section">
+                            <h4>💊 उपचार / Treatment</h4>
+                            <p id="treatmentText">—</p>
+                        </div>
+                        <div class="diagnosis-section">
+                            <h4>🧪 कीटनाशक / Pesticide</h4>
+                            <p id="pesticideText" class="pesticide-name">—</p>
+                        </div>
+                    </div>
+                    <div class="diagnosis-preview" id="diagnosisPreview"></div>
+                </div>
+            </div>
+
+            <!-- Vendors Tab -->
+            <div class="tab-content" id="vendorsTab">
+                <div class="empty-state" id="vendorsEmpty">
+                    <span class="empty-icon">📍</span>
+                    <p>Share your location to find nearby shops</p>
+                    <p class="hint">नज़दीकी दुकान ढूंढने के लिए location शेयर करें</p>
+                </div>
+                <div class="vendor-list hidden" id="vendorList"></div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Image Preview Modal -->
+    <div class="modal-overlay hidden" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📷 Crop Image Preview</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="imagePreview" alt="Crop image preview">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+                <button class="btn btn-primary" id="modalSend">🔬 Diagnose / जांच करें</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="demo.js"></script>
+</body>
+</html>

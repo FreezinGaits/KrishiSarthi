@@ -1,0 +1,145 @@
+{
+  "name": "Krishi-Sarthi: Pesticide Price Aggregation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "id": "c5a0e001-0005-4001-a005-000000000001",
+      "name": "Daily Cron (6 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://localhost:8000/api/vendors?limit=50",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "={{$env.KRISHI_API_KEY || 'dev-api-key-change-me'}}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000,
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "c5a0e001-0005-4001-a005-000000000002",
+      "name": "Fetch Vendor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Load pesticide price data from vendors\n// In production, this would scrape vendor websites or use their APIs\n\nconst vendorData = $input.first().json;\nconst vendors = vendorData.vendors || vendorData || [];\n\n// Simulated pesticide price database (common pesticides in Punjab)\nconst pesticidePrices = [\n  {\n    name: 'Mancozeb 75% WP',\n    hindi_name: 'मैन्कोज़ेब',\n    category: 'fungicide',\n    target_diseases: ['Early Blight', 'Late Blight', 'Downy Mildew'],\n    prices: [\n      { vendor: 'Sharma Krishi Kendra', city: 'Ludhiana', price_per_kg: 480, pack_size: '500g', price: 240 },\n      { vendor: 'Kisan Sewa Kendra', city: 'Ludhiana', price_per_kg: 460, pack_size: '1kg', price: 460 },\n      { vendor: 'Gurpreet Agri Store', city: 'Amritsar', price_per_kg: 500, pack_size: '500g', price: 250 },\n      { vendor: 'Punjab Pesticide Center', city: 'Patiala', price_per_kg: 470, pack_size: '1kg', price: 470 },\n    ]\n  },\n  {\n    name: 'Propiconazole 25% EC',\n    hindi_name: 'प्रोपिकोनाज़ोल',\n    category: 'fungicide',\n    target_diseases: ['Wheat Rust', 'Leaf Blight', 'Sheath Blight'],\n    prices: [\n      { vendor: 'Sharma Krishi Kendra', city: 'Ludhiana', price_per_litre: 850, pack_size: '250ml', price: 213 },\n      { vendor: 'Modern Krishi Dukaan', city: 'Ludhiana', price_per_litre: 820, pack_size: '500ml', price: 410 },\n      { vendor: 'Baldev Agri Supplies', city: 'Jalandhar', price_per_litre: 880, pack_size: '250ml', price: 220 },\n    ]\n  },\n  {\n    name: 'Tricyclazole 75% WP',\n    hindi_name: 'ट्राइसाइक्लाज़ोल',\n    category: 'fungicide',\n    target_diseases: ['Rice Blast'],\n    prices: [\n      { vendor: 'Punjab Agro Store', city: 'Ludhiana', price_per_kg: 1800, pack_size: '250g', price: 450 },\n      { vendor: 'Kisan Sewa Kendra', city: 'Ludhiana', price_per_kg: 1750, pack_size: '500g', price: 875 },\n      { vendor: 'Hardeep Pesticide Shop', city: 'Bathinda', price_per_kg: 1850, pack_size: '250g', price: 463 },\n    ]\n  },\n  {\n    name: 'Imidacloprid 17.8% SL',\n    hindi_name: 'इमिडाक्लोप्रिड',\n    category: 'insecticide',\n    target_diseases: ['Aphids', 'Whitefly', 'Jassids', 'Brown Plant Hopper'],\n    prices: [\n      { vendor: 'Sharma Krishi Kendra', city: 'Ludhiana', price_per_litre: 1200, pack_size: '100ml', price: 120 },\n      { vendor: 'Guru Nanak Agri Supplies', city: 'Ludhiana', price_per_litre: 1150, pack_size: '250ml', price: 288 },\n      { vendor: 'Royal Agri Center', city: 'Amritsar', price_per_litre: 1250, pack_size: '100ml', price: 125 },\n    ]\n  },\n  {\n    name: 'Copper Oxychloride 50% WP',\n    hindi_name: 'कॉपर ऑक्सीक्लोराइड',\n    category: 'fungicide',\n    target_diseases: ['Late Blight', 'Bacterial Leaf Blight', 'Downy Mildew'],\n    prices: [\n      { vendor: 'Punjab Agro Store', city: 'Ludhiana', price_per_kg: 350, pack_size: '500g', price: 175 },\n      { vendor: 'Kisan Sewa Kendra', city: 'Ludhiana', price_per_kg: 340, pack_size: '1kg', price: 340 },\n      { vendor: 'Punjab Pesticide Center', city: 'Patiala', price_per_kg: 360, pack_size: '500g', price: 180 },\n    ]\n  }\n];\n\nreturn pesticidePrices.map(p => ({ json: p }));"
+      },
+      "id": "c5a0e001-0005-4001-a005-000000000003",
+      "name": "Load Pesticide Prices",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate prices per pesticide\nconst items = $input.all();\n\nconst priceIndex = {\n  generated_at: new Date().toISOString(),\n  date: new Date().toISOString().split('T')[0],\n  region: 'Punjab',\n  total_pesticides: items.length,\n  pesticides: []\n};\n\nfor (const item of items) {\n  const p = item.json;\n  const prices = p.prices || [];\n  const priceValues = prices.map(pr => pr.price || 0).filter(v => v > 0);\n  \n  const avg = priceValues.length > 0 \n    ? Math.round(priceValues.reduce((a, b) => a + b, 0) / priceValues.length) \n    : 0;\n  const min = priceValues.length > 0 ? Math.min(...priceValues) : 0;\n  const max = priceValues.length > 0 ? Math.max(...priceValues) : 0;\n  \n  // Find cheapest vendor\n  const cheapest = prices.sort((a, b) => (a.price || 999999) - (b.price || 999999))[0] || {};\n  \n  priceIndex.pesticides.push({\n    name: p.name,\n    hindi_name: p.hindi_name,\n    category: p.category,\n    target_diseases: p.target_diseases,\n    price_stats: {\n      average: avg,\n      minimum: min,\n      maximum: max,\n      vendors_compared: priceValues.length,\n      currency: 'INR'\n    },\n    cheapest_vendor: {\n      name: cheapest.vendor || 'N/A',\n      city: cheapest.city || '',\n      price: cheapest.price || 0,\n      pack_size: cheapest.pack_size || ''\n    }\n  });\n}\n\nconsole.log('[Krishi-Sarthi PRICES]', JSON.stringify({\n  date: priceIndex.date,\n  pesticides: priceIndex.total_pesticides,\n  region: priceIndex.region\n}));\n\nreturn [{ json: priceIndex }];"
+      },
+      "id": "c5a0e001-0005-4001-a005-000000000004",
+      "name": "Aggregate Prices",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8000/api/notifications",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Key",
+              "value": "={{$env.KRISHI_API_KEY || 'dev-api-key-change-me'}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: 'price_index', title: `Daily Price Index: ${$json.date}`, message: `${$json.total_pesticides} pesticides aggregated for ${$json.region}`, priority: 'low', metadata: $json }) }}",
+        "options": {
+          "timeout": 10000,
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "c5a0e001-0005-4001-a005-000000000005",
+      "name": "Store Price Index",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 300],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Daily Cron (6 AM)": {
+      "main": [
+        [
+          { "node": "Fetch Vendor Data", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch Vendor Data": {
+      "main": [
+        [
+          { "node": "Load Pesticide Prices", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Load Pesticide Prices": {
+      "main": [
+        [
+          { "node": "Aggregate Prices", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Aggregate Prices": {
+      "main": [
+        [
+          { "node": "Store Price Index", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1",
+  "meta": {
+    "instanceId": "krishi-sarthi-local",
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    { "name": "krishi-sarthi" },
+    { "name": "pricing" },
+    { "name": "cron" }
+  ]
+}

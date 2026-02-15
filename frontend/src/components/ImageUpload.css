@@ -1,0 +1,97 @@
+/* ═══  Image Upload  ═══ */
+
+.image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.drop-zone {
+  width: 100%;
+  max-width: 500px;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 2px dashed var(--border-hi);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all var(--transition);
+  overflow: hidden;
+}
+.drop-zone:hover {
+  border-color: var(--green-500);
+  background: rgba(34,197,94,0.04);
+}
+.drop-zone.has-preview {
+  border-style: solid;
+  border-color: var(--green-600);
+}
+
+.drop-placeholder {
+  text-align: center;
+  padding: 30px;
+}
+.drop-icon { font-size: 3rem; display: block; margin-bottom: 14px; }
+.drop-placeholder p {
+  color: var(--text-dim);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.drop-hint { font-size: 0.8rem !important; color: var(--text-muted) !important; }
+
+.upload-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  min-height: 280px;
+  border-radius: calc(var(--radius-lg) - 2px);
+}
+
+/* ── Scan animation overlay ── */
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 15, 13, 0.7);
+  backdrop-filter: blur(4px);
+  border-radius: calc(var(--radius-lg) - 2px);
+  z-index: 5;
+}
+.upload-overlay p {
+  color: var(--green-300);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 16px;
+}
+.scan-animation {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--green-400), transparent);
+  box-shadow: 0 0 20px var(--green-400);
+  animation: scan 2s ease-in-out infinite;
+}
+@keyframes scan {
+  0%   { top: 5%; }
+  50%  { top: 90%; }
+  100% { top: 5%; }
+}
+
+.upload-error {
+  color: #f87171;
+  font-size: 0.9rem;
+  text-align: center;
+}

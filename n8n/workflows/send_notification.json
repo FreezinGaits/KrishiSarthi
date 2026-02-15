@@ -1,0 +1,148 @@
+{
+  "name": "Krishi-Sarthi: Send Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-notification",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c2a0e001-0002-4001-a002-000000000001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [260, 300],
+      "webhookId": "send-notification"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format diagnosis result into farmer-friendly Hindi message\nconst data = $input.first().json;\n\nconst event = data.event || 'send_notification';\nconst phone = data.phone || '';\nconst channel = data.channel || 'sms';\nconst metadata = data.metadata || data;\n\n// Extract diagnosis fields\nconst disease = metadata.disease_name || data.disease || 'Unknown';\nconst confidence = metadata.confidence || data.confidence || 0;\nconst treatment = metadata.treatment || data.treatment || '';\nconst pesticide = metadata.pesticide || data.pesticide || '';\nconst vendor = metadata.nearest_vendor || '';\nconst location = metadata.location || {};\n\n// Confidence percentage\nconst confPercent = Math.round(confidence * 100);\n\n// Build Hindi notification message\nlet message = '';\n\nif (confPercent >= 65) {\n  message = `🌾 *कृषि-सारथी अलर्ट* 🌾\\n\\n`;\n  message += `आपकी फसल में *${disease}* detected हुआ है (${confPercent}% confidence).\\n\\n`;\n  \n  if (treatment) {\n    message += `💊 *इलाज:*\\n${treatment}\\n\\n`;\n  }\n  \n  if (pesticide) {\n    message += `🧴 *Recommended pesticide:* ${pesticide}\\n\\n`;\n  }\n  \n  if (vendor) {\n    message += `🏪 *Nearest shop:* ${vendor}\\n\\n`;\n  }\n  \n  message += `📞 Kisan Helpline: 1800-180-1551 (toll free)\\n`;\n  message += `— कृषि-सारथी AI Assistant`;\n} else {\n  // Low confidence — softer message\n  message = `🌾 *कृषि-सारथी* 🌾\\n\\n`;\n  message += `आपकी फसल की जांच हो रही है. हमारे विशेषज्ञ जल्द संपर्क करेंगे.\\n\\n`;\n  message += `📞 Kisan Helpline: 1800-180-1551\\n`;\n  message += `— कृषि-सारथी AI Assistant`;\n}\n\nconst notification = {\n  notification_id: data.notification_id || `NOTIF-${Date.now()}`,\n  phone: phone,\n  channel: channel,\n  message: message,\n  disease: disease,\n  confidence: confPercent,\n  treatment: treatment,\n  pesticide: pesticide,\n  formatted_at: new Date().toISOString(),\n  language: 'hi',\n};\n\nreturn [{ json: notification }];"
+      },
+      "id": "c2a0e001-0002-4001-a002-000000000002",
+      "name": "Format Hindi Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-sms",
+              "leftValue": "={{ $json.channel }}",
+              "rightValue": "sms",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c2a0e001-0002-4001-a002-000000000003",
+      "name": "Route by Channel",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate SMS send (replace with Twilio/MSG91 in production)\nconst notification = $input.first().json;\n\nconst smsLog = {\n  type: 'SMS',\n  to: notification.phone,\n  message_preview: notification.message.substring(0, 160),\n  full_message: notification.message,\n  sent_at: new Date().toISOString(),\n  status: 'sent',\n  provider: 'mock_sms',\n  notification_id: notification.notification_id,\n  note: 'Production: Replace this node with Twilio SMS or MSG91 node'\n};\n\nconsole.log('[Krishi-Sarthi SMS]', JSON.stringify({\n  to: smsLog.to,\n  preview: smsLog.message_preview,\n  status: 'sent'\n}));\n\nreturn [{ json: { ...notification, delivery: smsLog } }];"
+      },
+      "id": "c2a0e001-0002-4001-a002-000000000004",
+      "name": "Send SMS (Mock)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulate WhatsApp send (replace with WhatsApp Business API in production)\nconst notification = $input.first().json;\n\nconst waLog = {\n  type: 'WhatsApp',\n  to: notification.phone,\n  message: notification.message,\n  sent_at: new Date().toISOString(),\n  status: 'sent',\n  provider: 'mock_whatsapp',\n  notification_id: notification.notification_id,\n  note: 'Production: Replace with WhatsApp Business API / Twilio WhatsApp node'\n};\n\nconsole.log('[Krishi-Sarthi WhatsApp]', JSON.stringify({\n  to: waLog.to,\n  status: 'sent'\n}));\n\nreturn [{ json: { ...notification, delivery: waLog } }];"
+      },
+      "id": "c2a0e001-0002-4001-a002-000000000005",
+      "name": "Send WhatsApp (Mock)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: $json.delivery ? $json.delivery.status : 'sent', notification_id: $json.notification_id, channel: $json.channel, disease: $json.disease, confidence: $json.confidence, sent_at: new Date().toISOString() }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "c2a0e001-0002-4001-a002-000000000006",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1140, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Format Hindi Message", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Hindi Message": {
+      "main": [
+        [
+          { "node": "Route by Channel", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Route by Channel": {
+      "main": [
+        [
+          { "node": "Send SMS (Mock)", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Send WhatsApp (Mock)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Send SMS (Mock)": {
+      "main": [
+        [
+          { "node": "Respond Success", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Send WhatsApp (Mock)": {
+      "main": [
+        [
+          { "node": "Respond Success", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1",
+  "meta": {
+    "instanceId": "krishi-sarthi-local",
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    { "name": "krishi-sarthi" },
+    { "name": "notification" },
+    { "name": "sms" }
+  ]
+}

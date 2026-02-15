@@ -1,0 +1,153 @@
+[
+  {
+    "id": "rice_leaf_blast",
+    "disease_name": "Rice Leaf Blast",
+    "hindi_name": "धान पत्ती ब्लास्ट / झोंका रोग",
+    "scientific_name": "Magnaporthe oryzae",
+    "crop": "Rice",
+    "symptoms": [
+      "Diamond-shaped or spindle-shaped spots with grey centers and dark borders",
+      "Spots may enlarge and merge causing large dead areas",
+      "Leaf tips and margins may die back",
+      "Seedlings may collapse at infected joints (node blast)",
+      "Neck blast: panicle base turns brown-black and breaks"
+    ],
+    "cause": "Fungus Magnaporthe oryzae (syn. Pyricularia oryzae). Most destructive rice disease worldwide. Spread by wind-borne conidia. Favored by high nitrogen, prolonged leaf wetness, and temperatures 22-28°C.",
+    "treatment": [
+      "Apply Tricyclazole 75% WP at 0.6g/litre",
+      "Or Isoprothiolane 40% EC at 1.5ml/litre",
+      "Spray at tillering stage and again at panicle emergence",
+      "Reduce nitrogen application if blast appears",
+      "Maintain 2-3cm standing water in paddy"
+    ],
+    "prevention": [
+      "Use resistant varieties: Pusa Basmati-1, PR-114, PR-126",
+      "Balanced nitrogen — split nitrogen application",
+      "Silicon application (rice husk ash) strengthens cell walls",
+      "Remove and destroy straw and stubble",
+      "Seed treatment with Tricyclazole or Carbendazim"
+    ],
+    "recommended_pesticide": {
+      "name": "Tricyclazole 75% WP",
+      "dosage": "0.6 grams per litre of water (300g per acre)",
+      "spray_interval": "Spray at tillering + booting stage",
+      "waiting_period": "21 days before harvest"
+    },
+    "severity": "critical",
+    "spread_speed": "fast",
+    "yield_loss_potential": "30-70%"
+  },
+  {
+    "id": "rice_brown_spot",
+    "disease_name": "Rice Brown Spot",
+    "hindi_name": "धान भूरा धब्बा रोग",
+    "scientific_name": "Bipolaris oryzae",
+    "crop": "Rice",
+    "symptoms": [
+      "Oval to circular brown spots on leaves, 5-14mm diameter",
+      "Spots have grey or white centers with brown borders",
+      "Spots may appear on leaf sheaths and panicle branches",
+      "Affected grains show brown-black discoloration",
+      "Often associated with nutrient-deficient soils"
+    ],
+    "cause": "Fungus Bipolaris oryzae (syn. Helminthosporium oryzae). Was the primary cause of the 1943 Bengal Famine. Seed-borne and soil-borne. Thrives in nutrient-deficient soils, especially potassium and silicon deficiency.",
+    "treatment": [
+      "Apply Mancozeb 75% WP at 2.5g/litre",
+      "Or Propiconazole 25% EC at 1ml/litre",
+      "Ensure balanced fertilization especially potassium",
+      "Apply Zinc Sulphate if zinc-deficient"
+    ],
+    "prevention": [
+      "Soil testing and balanced fertilization",
+      "Use healthy, certified seed",
+      "Seed treatment with Carbendazim 50% WP at 2g/kg seed",
+      "Apply potassium and zinc as per soil test recommendations",
+      "Maintain proper water management"
+    ],
+    "recommended_pesticide": {
+      "name": "Mancozeb 75% WP",
+      "dosage": "2.5 grams per litre of water",
+      "spray_interval": "Every 10-14 days during infection",
+      "waiting_period": "14 days before harvest"
+    },
+    "severity": "moderate",
+    "spread_speed": "moderate",
+    "yield_loss_potential": "10-30%"
+  },
+  {
+    "id": "rice_bacterial_blight",
+    "disease_name": "Rice Bacterial Leaf Blight",
+    "hindi_name": "धान जीवाणु पत्ती अंगमारी",
+    "scientific_name": "Xanthomonas oryzae pv. oryzae",
+    "crop": "Rice",
+    "symptoms": [
+      "Water-soaked lesions along leaf margins that turn yellow then white",
+      "Lesions extend along veins, giving leaves a 'scorched' appearance",
+      "Yellowish bacterial ooze visible on cut leaf edges in early morning",
+      "Severely infected leaves dry up from margins",
+      "Whole plant may wilt and die in kresek phase (seedlings)"
+    ],
+    "cause": "Bacterium Xanthomonas oryzae pv. oryzae. Enters through wounds and stomata. Spread by rain splash, wind, and contaminated irrigation water. Favored by high nitrogen, storms, and temperatures 28-34°C.",
+    "treatment": [
+      "Drain the field for 3-4 days",
+      "Apply Streptocycline at 0.5g + Copper Oxychloride at 2.5g per litre",
+      "Reduce nitrogen application immediately",
+      "Avoid field operations when leaves are wet",
+      "Ensure proper drainage"
+    ],
+    "prevention": [
+      "Use BLB-resistant varieties: PR-114, Pusa-44 (some resistance)",
+      "Balanced nitrogen — avoid excess urea",
+      "Proper field drainage",
+      "Avoid clipping seedling tips during transplanting",
+      "Avoid movement between wet fields"
+    ],
+    "recommended_pesticide": {
+      "name": "Streptocycline + Copper Oxychloride",
+      "dosage": "Streptocycline 0.5g + Copper Oxychloride 2.5g per litre",
+      "spray_interval": "Every 10 days during outbreak",
+      "waiting_period": "14 days before harvest"
+    },
+    "severity": "high",
+    "spread_speed": "fast",
+    "yield_loss_potential": "20-60%"
+  },
+  {
+    "id": "rice_sheath_blight",
+    "disease_name": "Rice Sheath Blight",
+    "hindi_name": "धान आवरण अंगमारी",
+    "scientific_name": "Rhizoctonia solani",
+    "crop": "Rice",
+    "symptoms": [
+      "Oval to irregular greenish-grey lesions on leaf sheaths near water line",
+      "Lesions have dark brown borders",
+      "Lesions move upward affecting successive sheaths and leaves",
+      "White mycelium may be visible on affected sheaths",
+      "Sclerotia (small brown-white bodies) form on sheaths"
+    ],
+    "cause": "Fungus Rhizoctonia solani. Soil-borne — sclerotia survive in soil for years. Spread through sclerotia floating in irrigation water. Favored by high nitrogen, dense planting, high humidity, and temperatures 28-32°C.",
+    "treatment": [
+      "Apply Hexaconazole 5% EC at 2ml/litre",
+      "Or Validamycin 3% L at 2ml/litre",
+      "Spray targeting the lower leaf sheath area",
+      "Reduce water level to expose lower sheaths",
+      "Remove floating sclerotia from field"
+    ],
+    "prevention": [
+      "Maintain proper plant spacing — wider spacing reduces spread",
+      "Balanced nitrogen — split applications",
+      "Avoid continuous flooding",
+      "Deep ploughing in summer to bury sclerotia",
+      "Remove and destroy infected stubble"
+    ],
+    "recommended_pesticide": {
+      "name": "Hexaconazole 5% EC",
+      "dosage": "2 ml per litre of water",
+      "spray_interval": "Spray at boot leaf stage",
+      "waiting_period": "21 days before harvest"
+    },
+    "severity": "high",
+    "spread_speed": "moderate",
+    "yield_loss_potential": "15-40%"
+  }
+]

@@ -1,0 +1,138 @@
+{
+  "name": "Krishi-Sarthi: Vendor Enrichment",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vendor-enrichment",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c1a0e001-0001-4001-a001-000000000001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [260, 300],
+      "webhookId": "vendor-enrichment"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract vendor data from webhook payload\nconst vendor = $input.first().json;\n\nconst enriched = {\n  vendor_id: vendor.vendor_id || `VND-${Date.now()}`,\n  name: vendor.name || 'Unknown Vendor',\n  address: vendor.address || '',\n  phone: vendor.phone || '',\n  lat: vendor.lat || 0,\n  lng: vendor.lng || 0,\n  city: vendor.city || '',\n  state: vendor.state || 'Punjab',\n  \n  // Enrichment fields\n  enriched: true,\n  enriched_at: new Date().toISOString(),\n  \n  // Calculated fields\n  verified: vendor.phone ? true : false,\n  has_location: (vendor.lat && vendor.lng) ? true : false,\n  \n  // Product categorization\n  products: vendor.products || [],\n  product_categories: [],\n  \n  // Business intelligence\n  rating: vendor.rating || null,\n  operating_hours: vendor.operating_hours || '9:00 AM - 7:00 PM',\n  accepts_digital_payment: vendor.accepts_digital_payment || false,\n  delivery_available: vendor.delivery_available || false,\n};\n\n// Categorize products\nconst categories = new Set();\nconst productStr = (enriched.products || []).join(' ').toLowerCase();\n\nif (productStr.match(/pesticide|कीटनाशक|insecticide|fungicide/)) categories.add('pesticides');\nif (productStr.match(/fertilizer|खाद|urea|dap|npk/)) categories.add('fertilizers');\nif (productStr.match(/seed|बीज|hybrid/)) categories.add('seeds');\nif (productStr.match(/equipment|sprayer|pump|tool/)) categories.add('equipment');\nif (productStr.match(/organic|जैविक|bio/)) categories.add('organic');\n\nenriched.product_categories = Array.from(categories);\n\n// Quality score (0-100)\nlet score = 0;\nif (enriched.verified) score += 20;\nif (enriched.has_location) score += 20;\nif (enriched.rating) score += Math.min(enriched.rating * 5, 25);\nif (enriched.products.length > 0) score += 15;\nif (enriched.accepts_digital_payment) score += 10;\nif (enriched.delivery_available) score += 10;\n\nenriched.quality_score = Math.round(score);\n\nreturn [{ json: enriched }];"
+      },
+      "id": "c1a0e001-0001-4001-a001-000000000002",
+      "name": "Enrich Vendor Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8000/api/vendors/enriched",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Key",
+              "value": "={{$env.KRISHI_API_KEY || 'dev-api-key-change-me'}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "vendor",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000,
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "c1a0e001-0001-4001-a001-000000000003",
+      "name": "Store Enriched Vendor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log the enrichment execution\nconst vendor = $input.first().json;\n\nconst logEntry = {\n  workflow: 'vendor_enrichment',\n  timestamp: new Date().toISOString(),\n  vendor_id: vendor.vendor_id || 'unknown',\n  vendor_name: vendor.name || 'unknown',\n  quality_score: vendor.quality_score || 0,\n  categories: vendor.product_categories || [],\n  enriched: true,\n  status: 'completed'\n};\n\nconsole.log('[Krishi-Sarthi] Vendor enrichment:', JSON.stringify(logEntry));\n\nreturn [{ json: logEntry }];"
+      },
+      "id": "c1a0e001-0001-4001-a001-000000000004",
+      "name": "Log Execution",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'enriched', vendor_id: $('Enrich Vendor Data').first().json.vendor_id, quality_score: $('Enrich Vendor Data').first().json.quality_score, categories: $('Enrich Vendor Data').first().json.product_categories, enriched_at: $('Enrich Vendor Data').first().json.enriched_at }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "c1a0e001-0001-4001-a001-000000000005",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [920, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Enrich Vendor Data", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Enrich Vendor Data": {
+      "main": [
+        [
+          { "node": "Store Enriched Vendor", "type": "main", "index": 0 },
+          { "node": "Log Execution", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Store Enriched Vendor": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Log Execution": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1",
+  "meta": {
+    "instanceId": "krishi-sarthi-local",
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    { "name": "krishi-sarthi" },
+    { "name": "vendor" },
+    { "name": "enrichment" }
+  ]
+}

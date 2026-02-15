@@ -1,0 +1,160 @@
+[
+  {
+    "id": "tomato_early_blight",
+    "disease_name": "Tomato Early Blight",
+    "hindi_name": "टमाटर अगेती झुलसा",
+    "scientific_name": "Alternaria solani",
+    "crop": "Tomato",
+    "symptoms": [
+      "Dark brown-black spots with concentric rings (target pattern) on lower leaves",
+      "Spots may have yellow halos",
+      "Starts on older/lower leaves and moves upward",
+      "Premature leaf drop and defoliation",
+      "Dark, sunken lesions on stems near soil line",
+      "Fruit may develop dark, leathery spots near stem end"
+    ],
+    "cause": "Fungus Alternaria solani, spread through wind, rain splash, and infected plant debris. Thrives in warm (24-29°C), humid weather with alternating wet-dry conditions.",
+    "treatment": [
+      "Apply Mancozeb 75% WP at 2.5g/litre water — spray every 10-14 days",
+      "Alternatively use Chlorothalonil 75% WP at 2g/litre",
+      "Remove and destroy affected lower leaves immediately",
+      "Stake plants for better air circulation",
+      "Water at soil level, avoid wetting foliage",
+      "Apply mulch around base to prevent soil splash"
+    ],
+    "prevention": [
+      "Use certified disease-free seeds from trusted sources",
+      "Maintain 60cm spacing between plants",
+      "3-year crop rotation — avoid planting tomato/potato/brinjal in same field",
+      "Destroy crop debris after harvest — do not compost infected material",
+      "Apply preventive fungicide spray before monsoon season",
+      "Use resistant varieties when available"
+    ],
+    "recommended_pesticide": {
+      "name": "Mancozeb 75% WP",
+      "dosage": "2.5 grams per litre of water",
+      "spray_interval": "Every 10-14 days during humid weather",
+      "waiting_period": "7 days before harvest"
+    },
+    "severity": "moderate",
+    "spread_speed": "slow",
+    "yield_loss_potential": "20-40%"
+  },
+  {
+    "id": "tomato_late_blight",
+    "disease_name": "Tomato Late Blight",
+    "hindi_name": "टमाटर पिछेती झुलसा",
+    "scientific_name": "Phytophthora infestans",
+    "crop": "Tomato",
+    "symptoms": [
+      "Large, irregular, water-soaked greenish-black lesions on leaves",
+      "White fuzzy mold on leaf undersides in humid conditions",
+      "Rapid browning and death of entire leaves and stems",
+      "Firm, dark, greasy-looking spots on green and ripe fruit",
+      "Entire plant can collapse within 5-7 days",
+      "Strong musty odor from severely affected plants"
+    ],
+    "cause": "Oomycete Phytophthora infestans — same pathogen as Irish Potato Famine. Spread by wind-blown sporangia. Requires cool (15-22°C) and wet conditions. Can travel miles through wind.",
+    "treatment": [
+      "URGENT: Apply Copper Oxychloride 50% WP at 3g/litre immediately",
+      "Or Metalaxyl + Mancozeb (Ridomil Gold) at 2.5g/litre",
+      "Spray ENTIRE field including unaffected plants",
+      "Remove and BURN infected plants — DO NOT compost",
+      "Avoid any overhead irrigation",
+      "Contact nearest KVK for emergency guidance"
+    ],
+    "prevention": [
+      "Plant resistant varieties (Check PAU/IARI recommendations)",
+      "Never plant near potato fields",
+      "Ensure excellent air flow — stake and prune plants",
+      "Avoid overhead irrigation",
+      "Scout fields daily during cool, wet weather",
+      "Destroy all volunteer tomato and potato plants"
+    ],
+    "recommended_pesticide": {
+      "name": "Copper Oxychloride 50% WP",
+      "dosage": "3 grams per litre of water",
+      "spray_interval": "Every 7 days during outbreak",
+      "waiting_period": "7 days before harvest"
+    },
+    "severity": "critical",
+    "spread_speed": "very_fast",
+    "yield_loss_potential": "80-100%"
+  },
+  {
+    "id": "tomato_leaf_mold",
+    "disease_name": "Tomato Leaf Mold",
+    "hindi_name": "टमाटर पत्ती फफूंद",
+    "scientific_name": "Passalora fulva",
+    "crop": "Tomato",
+    "symptoms": [
+      "Pale greenish-yellow spots on upper leaf surface",
+      "Velvety olive-green to brown mold on leaf undersides",
+      "Lower and middle leaves affected first",
+      "Leaves may curl, wither, and drop",
+      "Rarely affects fruit but reduces overall yield"
+    ],
+    "cause": "Fungus Passalora fulva (syn. Cladosporium fulvum). Thrives in high humidity (>85%) and warm greenhouse/polyhouse conditions. Spores persist on plant debris and structures.",
+    "treatment": [
+      "Improve ventilation — open polyhouse vents daily",
+      "Apply Chlorothalonil 75% WP at 2g/litre",
+      "Reduce humidity below 85%",
+      "Remove lower leaves for better air flow",
+      "Space plants wider to improve ventilation"
+    ],
+    "prevention": [
+      "Use resistant varieties",
+      "Maintain good ventilation in protected cultivation",
+      "Avoid leaf wetness — use drip irrigation",
+      "Remove and destroy crop debris between seasons",
+      "Sanitize polyhouse structures between crops"
+    ],
+    "recommended_pesticide": {
+      "name": "Chlorothalonil 75% WP",
+      "dosage": "2 grams per litre of water",
+      "spray_interval": "Every 14 days",
+      "waiting_period": "7 days before harvest"
+    },
+    "severity": "moderate",
+    "spread_speed": "moderate",
+    "yield_loss_potential": "15-30%"
+  },
+  {
+    "id": "tomato_septoria_leaf_spot",
+    "disease_name": "Tomato Septoria Leaf Spot",
+    "hindi_name": "टमाटर सेप्टोरिया पत्ती धब्बा",
+    "scientific_name": "Septoria lycopersici",
+    "crop": "Tomato",
+    "symptoms": [
+      "Small circular spots (2-3mm) with dark borders and grey-white centers",
+      "Tiny black dots (pycnidia) visible in spot centers",
+      "Starts on lower leaves near soil",
+      "Heavy infection causes yellowing and defoliation",
+      "Rarely affects fruit directly but reduces quality through defoliation"
+    ],
+    "cause": "Fungus Septoria lycopersici. Spread via rain splash from infected debris. Favored by warm (20-25°C), wet weather with extended leaf wetness.",
+    "treatment": [
+      "Apply Mancozeb 75% WP at 2.5g/litre",
+      "Or Chlorothalonil at 2g/litre",
+      "Remove infected lower leaves promptly",
+      "Mulch around plants to prevent soil splash",
+      "Water at soil level only"
+    ],
+    "prevention": [
+      "3-year crop rotation away from solanaceous crops",
+      "Destroy all crop debris after harvest",
+      "Use stake support and avoid crowding",
+      "Apply mulch to prevent rain-splashed soil",
+      "Scout and remove infected leaves early"
+    ],
+    "recommended_pesticide": {
+      "name": "Mancozeb 75% WP",
+      "dosage": "2.5 grams per litre of water",
+      "spray_interval": "Every 10-14 days",
+      "waiting_period": "7 days before harvest"
+    },
+    "severity": "moderate",
+    "spread_speed": "moderate",
+    "yield_loss_potential": "20-50%"
+  }
+]

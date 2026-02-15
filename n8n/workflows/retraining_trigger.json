@@ -1,0 +1,132 @@
+{
+  "name": "Krishi-Sarthi: Model Retraining Trigger",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "retraining-trigger",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "c4a0e001-0004-4001-a004-000000000001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [260, 300],
+      "webhookId": "retraining-trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process corrected diagnosis for model retraining\nconst data = $input.first().json;\n\nconst sample = {\n  sample_id: `RTR-${Date.now()}`,\n  event: 'retraining_sample',\n  received_at: new Date().toISOString(),\n  \n  // Original prediction\n  original_disease: data.original_disease || data.disease || 'Unknown',\n  original_confidence: data.original_confidence || data.confidence || 0,\n  model_version: data.model_version || 'v1.0',\n  \n  // Corrected label (from expert)\n  corrected_disease: data.corrected_disease || data.correct_label || '',\n  corrected_by: data.corrected_by || 'agronomist',\n  correction_source: data.correction_source || 'escalation_review',\n  \n  // Image reference\n  image_path: data.image_path || '',\n  crop: data.crop || '',\n  \n  // Metadata\n  request_id: data.request_id || '',\n  location: data.location || {},\n  \n  // Retraining flags\n  is_misclassification: data.original_disease !== (data.corrected_disease || data.correct_label),\n  needs_review: true,\n  added_to_training_set: false,\n  status: 'queued'\n};\n\nconsole.log('[Krishi-Sarthi RETRAINING]', JSON.stringify({\n  sample_id: sample.sample_id,\n  original: sample.original_disease,\n  corrected: sample.corrected_disease,\n  is_misclassification: sample.is_misclassification\n}));\n\nreturn [{ json: sample }];"
+      },
+      "id": "c4a0e001-0004-4001-a004-000000000002",
+      "name": "Process Retraining Sample",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://localhost:8000/api/notifications",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-API-Key",
+              "value": "={{$env.KRISHI_API_KEY || 'dev-api-key-change-me'}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: 'retraining', title: `Retraining sample: ${$json.original_disease} → ${$json.corrected_disease}`, message: `Model ${$json.model_version} misclassified. Sample queued for retraining.`, priority: 'low', metadata: { sample_id: $json.sample_id, original: $json.original_disease, corrected: $json.corrected_disease, model_version: $json.model_version } }) }}",
+        "options": {
+          "timeout": 10000,
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "c4a0e001-0004-4001-a004-000000000003",
+      "name": "Store Retraining Sample",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Log the retraining trigger\nconst sample = $input.first().json;\n\nconst logEntry = {\n  workflow: 'retraining_trigger',\n  timestamp: new Date().toISOString(),\n  sample_id: sample.sample_id,\n  original_disease: sample.original_disease,\n  corrected_disease: sample.corrected_disease,\n  is_misclassification: sample.is_misclassification,\n  model_version: sample.model_version,\n  status: 'logged',\n  \n  // Stats tracking\n  note: 'In production: aggregate samples and trigger batch retraining when threshold reached'\n};\n\nconsole.log('[Krishi-Sarthi RETRAIN LOG]', JSON.stringify(logEntry));\n\nreturn [{ json: logEntry }];"
+      },
+      "id": "c4a0e001-0004-4001-a004-000000000004",
+      "name": "Log Retraining Trigger",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'queued', sample_id: $('Process Retraining Sample').first().json.sample_id, original_disease: $('Process Retraining Sample').first().json.original_disease, corrected_disease: $('Process Retraining Sample').first().json.corrected_disease, is_misclassification: $('Process Retraining Sample').first().json.is_misclassification, queued_at: new Date().toISOString() }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "c4a0e001-0004-4001-a004-000000000005",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [920, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Process Retraining Sample", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Process Retraining Sample": {
+      "main": [
+        [
+          { "node": "Store Retraining Sample", "type": "main", "index": 0 },
+          { "node": "Log Retraining Trigger", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Store Retraining Sample": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Log Retraining Trigger": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1",
+  "meta": {
+    "instanceId": "krishi-sarthi-local",
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    { "name": "krishi-sarthi" },
+    { "name": "retraining" },
+    { "name": "ml-ops" }
+  ]
+}
