@@ -93,3 +93,7 @@ Desktop.ini
 *.tmp
 *.temp
 .cache/
+
+# Raw datasets (too large for git)
+ai-service/data/raw/
+demo_assets/sample_images/
