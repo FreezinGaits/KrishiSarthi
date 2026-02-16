@@ -93,7 +93,7 @@ def start_backend():
         print(f"{Y}[WARN] No venv found, using system Python{R}")
 
     env = os.environ.copy()
-    env["DEMO_MODE"] = "true"
+    # env["DEMO_MODE"] = "true"  # Let .env control this
     p = subprocess.Popen(
         [py, "run.py"],
         cwd=str(BACKEND),

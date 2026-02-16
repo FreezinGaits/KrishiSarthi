@@ -4,15 +4,28 @@ import DiagnosisCard from './DiagnosisCard'
 import './ChatInterface.css'
 
 const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, initialInput, onDiagnosis }, ref) {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      text: 'नमस्ते! मैं कृषि-सारथी हूँ 🌾\nमैं आपकी फसल की बीमारी पहचानने, इलाज बताने और नज़दीकी दुकान खोजने में मदद कर सकता हूँ।\n\nHow can I help you today?',
-    },
-  ])
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('chat_history')
+    return saved ? JSON.parse(saved) : [
+      {
+        role: 'assistant',
+        text: 'नमस्ते! मैं कृषि-सारथी हूँ 🌾\nमैं आपकी फसल की बीमारी पहचानने, इलाज बताने और नज़दीकी दुकान खोजने में मदद कर सकता हूँ।\n\nHow can I help you today?',
+      },
+    ]
+  })
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef()
+
+  // Save messages to local storage whenever they change
+  useEffect(() => {
+    localStorage.setItem('chat_history', JSON.stringify(messages))
+  }, [messages])
+
+  // Save session ID if provided
+  useEffect(() => {
+    if (sessionId) localStorage.setItem('chat_session_id', sessionId)
+  }, [sessionId])
 
   useEffect(() => {
     if (initialInput) setInput(initialInput)
@@ -34,8 +47,9 @@ const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, i
     setLoading(true)
 
     try {
+      const activeSessionId = sessionId || localStorage.getItem('chat_session_id')
       const res = await chatWithAgent(
-        msg, sessionId, null,
+        msg, activeSessionId, null,
         location?.lat, location?.lng, 'hi'
       )
       setMessages((prev) => [

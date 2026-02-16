@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     openai_embedding_model: str = "text-embedding-3-small"
     whisper_model: str = "whisper-1"
 
+    # ── Grok (xAI) ────────────────────────────────────────
+    grok_api_key: str = ""
+    grok_base_url: str = "https://api.x.ai/v1"
+    grok_model: str = "grok-2-latest"
+
     # ── Google Maps ───────────────────────────────────────
     google_maps_api_key: str = ""
     google_maps_base_url: str = "https://maps.googleapis.com/maps/api"
@@ -56,9 +61,10 @@ class Settings(BaseSettings):
     n8n_retraining_webhook: str = "/webhook/retraining-trigger"
 
     # ── AI Models ─────────────────────────────────────────
-    classifier_model_path: str = "ai-service/models/classifier.pth"
-    faiss_index_path: str = "ai-service/models/faiss_index"
-    class_labels_path: str = "ai-service/class_labels.json"
+    # ── AI Models ─────────────────────────────────────────
+    classifier_model_path: str = str(Path(__file__).parent.parent.parent / "ai-service/models/classifier.pth")
+    faiss_index_path: str = str(Path(__file__).parent.parent.parent / "ai-service/models/faiss_index")
+    class_labels_path: str = str(Path(__file__).parent.parent.parent / "ai-service/class_labels.json")
 
     # ── Uploads ───────────────────────────────────────────
     upload_dir: str = "uploads"

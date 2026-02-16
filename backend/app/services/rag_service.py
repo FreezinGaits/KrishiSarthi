@@ -30,9 +30,18 @@ logger = get_logger("service.rag")
 settings = get_settings()
 
 # ── Lazy-loaded globals ───────────────────────────
+# ── Lazy-loaded globals ───────────────────────────
 _faiss_index = None
 _embeddings_model = None
 _documents: Optional[List[Dict]] = None
+
+STOPWORDS = {
+    "why", "are", "my", "is", "the", "in", "at", "on", "to", "for", "of", "with",
+    "a", "an", "and", "or", "but", "if", "then", "else", "when", "how", "do", "does",
+    "did", "can", "could", "should", "would", "will", "what", "where", "who", "whom",
+    "kya", "kyon", "kaise", "kab", "kahan", "hai", "hain", "ho", "hu", "mera", "meri",
+    "mere", "ke", "ki", "ka", "se", "me", "mein", "par", "ko", "ne", "bhi", "hi",
+}
 
 
 @dataclass
@@ -156,6 +165,24 @@ KNOWLEDGE_BASE: List[Dict[str, str]] = [
             "• Remove weed hosts from field bunds"
         ),
     },
+    {
+        "title": "Green Potatoes (Solanine Toxicity)",
+        "category": "safety",
+        "keywords": "potato aloo green hari solanine sun light poison toxic zelene",
+        "content": (
+            "**Why are potatoes turning green?**\n"
+            "This is caused by exposure to **sunlight**, which produces chlorophyll (green color) "
+            "and a toxic compound called **Solanine**.\n\n"
+            "**Is it safe to eat?**\n"
+            "• **NO**, solanine is toxic and can cause nausea, headaches, and stomach pain.\n"
+            "• If greening is slight, peel away the green part deeply.\n"
+            "• If the potato is mostly green, **throw it away**.\n\n"
+            "**Prevention:**\n"
+            "• Store potatoes in a cool, dark place (not on the balcony!)\n"
+            "• Hill up soil around potato plants to cover tubers completely\n"
+            "• Do not wash potatoes until you are ready to use them"
+        ),
+    },
     # ── Potato Diseases ───────────────────────────
     {
         "title": "Potato Late Blight (Phytophthora infestans)",
@@ -254,6 +281,44 @@ KNOWLEDGE_BASE: List[Dict[str, str]] = [
             "• Light green or yellowing leaves"
         ),
     },
+    {
+        "title": "Onion Black Mold / Smut (Aspergillus niger)",
+        "category": "disease",
+        "keywords": "onion pyaz kanda black mold smut kaali fafundi leaves bulb storage",
+        "content": (
+            "**Onion Black Mold** is a common fungal disease in hot climates.\n\n"
+            "**Symptoms:**\n"
+            "• Black powdery masses of spores on outer scales of bulb\n"
+            "• Black streaks on leaves and neck\n"
+            "• Bulbs shrivel and rot in storage\n\n"
+            "**Treatment:**\n"
+            "• Seed treatment with Carbendazim at 2g/kg\n"
+            "• Spray Mancozeb 0.25% or Tricyclazole 0.1%\n"
+            "• Ensure proper curing (drying) of bulbs before storage\n\n"
+            "**Prevention:**\n"
+            "• Store in cool, well-ventilated rooms\n"
+            "• Avoid injury to bulbs during harvest"
+        ),
+    },
+    {
+        "title": "Chilli/Pepper Bacterial Spot (Xanthomonas campestris)",
+        "category": "disease",
+        "keywords": "chilli pepper mirch capsicum bacterial spot leaf fruit dark lesions",
+        "content": (
+            "**Bacterial Spot in Chilli/Pepper** is caused by Xanthomonas campestris.\n\n"
+            "**Symptoms:**\n"
+            "• Small, irregular, water-soaked spots on leaves\n"
+            "• Spots turn dark brown with yellow halos\n"
+            "• Leaves turn yellow and drop (defoliation)\n"
+            "• Raised, wart-like brown spots on fruit\n\n"
+            "**Treatment:**\n"
+            "• Spray Copper Oxychloride (3g/L) + Streptocycline (1g/10L)\n"
+            "• Repeat every 10-12 days\n\n"
+            "**Prevention:**\n"
+            "• Use disease-free seeds\n"
+            "• Crop rotation with non-solanaceous crops (corn, beans)"
+        ),
+    },
 ]
 
 
@@ -330,8 +395,9 @@ if _json_entries:
 
 
 def _tokenize(text: str) -> List[str]:
-    """Simple tokenizer — lowercase, split on non-alphanumeric."""
-    return re.findall(r'[a-z0-9\u0900-\u097f]+', text.lower())
+    """Simple tokenizer — lowercase, split on non-alphanumeric, remove stopwords."""
+    words = re.findall(r'[a-z0-9\u0900-\u097f]+', text.lower())
+    return [w for w in words if w not in STOPWORDS]
 
 
 def _compute_relevance(query_tokens: List[str], doc_keywords: str, doc_content: str) -> float:
@@ -427,7 +493,7 @@ async def _search_faiss(query: str, top_k: int, request_id: str) -> List[Knowled
     return results
 
 
-def _search_keyword(query: str, top_k: int, request_id: str) -> List[KnowledgeResult]:
+def _search_keyword(query: str, top_k: int, request_id: str, crop: Optional[str] = None) -> List[KnowledgeResult]:
     """Search using keyword matching over the in-memory knowledge base."""
     query_tokens = _tokenize(query)
 
@@ -436,7 +502,42 @@ def _search_keyword(query: str, top_k: int, request_id: str) -> List[KnowledgeRe
         return []
 
     scored_docs = []
+    
+    # Crop aliases for filtering
+    crop_aliases = {
+        "tomato": ["tomato", "tamatar"],
+        "potato": ["potato", "aloo"],
+        "rice": ["rice", "chawal", "dhaan", "paddy"],
+        "wheat": ["wheat", "gehu", "gehun"],
+        "onion": ["onion", "pyaz", "kanda"],
+        "pepper": ["pepper", "chilli", "mirch", "capsicum"],
+        "corn": ["corn", "maize", "makka"],
+    }
+    
+    target_crop_keywords = crop_aliases.get(crop, []) if crop else []
+
     for doc in KNOWLEDGE_BASE:
+        # ── Crop Filtering Logic ──
+        # If a specific crop is requested, SKIP docs that belong to other crops.
+        # We determine a doc's crop by checking if its keywords contain any alias of a KNOWN crop.
+        doc_keywords_str = doc.get("keywords", "")
+        
+        if crop and target_crop_keywords:
+            # Check if this doc is for the target crop
+            is_target_crop = any(alias in doc_keywords_str for alias in target_crop_keywords)
+            
+            # Check if this doc matches ANY known crop
+            is_any_crop = False
+            for c_name, aliases in crop_aliases.items():
+                if any(alias in doc_keywords_str for alias in aliases):
+                    is_any_crop = True
+                    break
+            
+            # If doc is successfully identified as Another Crop, skip it.
+            # If doc is General (no crop keywords), keep it.
+            if is_any_crop and not is_target_crop:
+                continue
+
         score = _compute_relevance(
             query_tokens,
             doc.get("keywords", ""),
@@ -467,6 +568,7 @@ async def search_knowledge(
     query: str,
     top_k: int = 3,
     request_id: str = "",
+    crop: Optional[str] = None,
 ) -> List[KnowledgeResult]:
     """
     Main entry point for knowledge retrieval.
@@ -499,7 +601,7 @@ async def search_knowledge(
                 logger.error("[%s] FAISS search failed: %s", request_id, str(e))
 
     # ── Keyword fallback ──────────────────────────
-    results = _search_keyword(query, top_k, request_id)
+    results = _search_keyword(query, top_k, request_id, crop=crop)
     logger.info("[%s] Keyword search returned %d results", request_id, len(results))
 
     if not results:

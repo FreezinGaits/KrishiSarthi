@@ -1,0 +1,73 @@
+
+    ===================================================
+    |          KRISHI-SARTHI                           |
+    |     Vernacular Agentic AI for Farmers            |
+    |                                                  |
+    |     Voice - Vision - Vendor Discovery            |
+    ===================================================
+    
+  Configuration:
+    App Name:      Krishi-Sarthi
+    Environment:   development
+    Demo Mode:     OFF
+    Mock AI:       OFF
+    Mock Vendors:  OFF
+    Database URL:  postgresql://postgres:NiggaInTheWater@07...
+    OpenAI Key:    Set
+
+  Initializing database... WARNING
+    Database error: [Errno 11003] getaddrinfo failed
+    -> Using SQLite fallback for demo
+2026-02-16 13:14:54,259 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-02-16 13:14:54,259 INFO sqlalchemy.engine.Engine COMMIT
+  SQLite fallback ready
+  Verifying services...
+    [OK] Whisper STT
+    [OK] Classifier
+    [OK] Vendor Search
+2026-02-16 13:14:54 | INFO     | service.rag | Loaded 4 diseases from rice_diseases.json
+2026-02-16 13:14:54 | INFO     | service.rag | Loaded 5 diseases from tomato_diseases.json
+2026-02-16 13:14:54 | INFO     | service.rag | Loaded 4 diseases from wheat_diseases.json
+2026-02-16 13:14:54 | INFO     | service.rag | Knowledge base total: 23 entries (13 from JSON)
+    [OK] RAG Knowledge
+    [OK] Agent
+    [OK] n8n Webhooks
+
+  [OK] Krishi-Sarthi backend ready!
+
+  Starting server on http://0.0.0.0:8000
+  API docs: http://localhost:8000/docs
+  Demo UI:  Open frontend/demo.html in browser
+
+2026-02-16 13:14:56 | INFO     | main | Starting Krishi-Sarthi (env=development, demo=False)
+2026-02-16 13:14:56,234 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-02-16 13:14:56,235 INFO sqlalchemy.engine.Engine COMMIT
+2026-02-16 13:14:56 | INFO     | main | Database initialized
+2026-02-16 13:15:06 | INFO     | middleware | REQ 23538f04 | POST /api/diagnose-image | client=127.0.0.1
+2026-02-16 13:15:06 | INFO     | router.diagnosis | [8be80b16] Diagnosis request: filename=test_leaf.jpg, content_type=image/jpeg
+2026-02-16 13:15:06 | INFO     | router.diagnosis | [8be80b16] Image size: 0.6 KB
+2026-02-16 13:15:07 | INFO     | service.classifier | [8be80b16] Classification request: filename=test_leaf.jpg, size=0.6KB
+DEBUG: Attempting to load model from: ai-service\models\classifier.pth
+DEBUG: Torch imported. CUDA: True
+2026-02-16 13:15:20 | INFO     | service.classifier | Loaded 19 class labels from ai-service\class_labels.json
+DEBUG: Using 19 classes from class_labels.json
+DEBUG: Classifier model loaded successfully (19 classes)
+2026-02-16 13:15:24 | INFO     | router.diagnosis | [8be80b16] Classification success: disease=PlantVillage, confidence=1.00
+2026-02-16 13:15:24 | INFO     | middleware | RES 23538f04 | POST /api/diagnose-image | status=200 | 17402.5ms
+INFO:     127.0.0.1:64067 - "POST /api/diagnose-image HTTP/1.1" 200 OK
+2026-02-16 13:16:58 | INFO     | middleware | REQ eb1343df | POST /api/diagnose-image | client=127.0.0.1
+2026-02-16 13:16:58 | INFO     | router.diagnosis | [86baafdb] Diagnosis request: filename=test_leaf.jpg, content_type=image/jpeg
+2026-02-16 13:16:58 | INFO     | router.diagnosis | [86baafdb] Image size: 0.6 KB
+2026-02-16 13:16:58 | INFO     | service.classifier | [86baafdb] Classification request: filename=test_leaf.jpg, size=0.6KB
+2026-02-16 13:16:58 | INFO     | router.diagnosis | [86baafdb] Classification success: disease=PlantVillage, confidence=1.00
+2026-02-16 13:16:58 | INFO     | middleware | RES eb1343df | POST /api/diagnose-image | status=200 | 61.2ms
+INFO:     127.0.0.1:63160 - "POST /api/diagnose-image HTTP/1.1" 200 OK
+2026-02-16 13:18:13 | INFO     | middleware | REQ 46175e7f | GET /api/health | client=127.0.0.1
+2026-02-16 13:18:16 | INFO     | service.rag | Loaded 4 diseases from rice_diseases.json
+2026-02-16 13:18:16 | INFO     | service.rag | Loaded 5 diseases from tomato_diseases.json
+2026-02-16 13:18:16 | INFO     | service.rag | Loaded 4 diseases from wheat_diseases.json
+2026-02-16 13:18:16 | INFO     | service.rag | Knowledge base total: 23 entries (13 from JSON)
+2026-02-16 13:18:16 | INFO     | middleware | RES 46175e7f | GET /api/health | status=200 | 2352.9ms
+2026-02-16 13:18:18 | INFO     | middleware | REQ 4a31f3c3 | GET /api/health | client=127.0.0.1
+2026-02-16 13:18:20 | INFO     | middleware | RES 4a31f3c3 | GET /api/health | status=200 | 1752.9ms
+INFO:     127.0.0.1:64427 - "GET /api/health HTTP/1.1" 200 OK

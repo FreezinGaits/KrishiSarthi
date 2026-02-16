@@ -1,0 +1,14 @@
+D:\Program Files\Python312\Lib\site-packages\pydantic\_internal\_fields.py:132: UserWarning: Field "model_version" in DiagnoseImageResponse has conflict with protected namespace "model_".
+
+You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
+  warnings.warn(
+INFO:     Will watch for changes in these directories: ['D:\\Code Playground\\KrishiSarthi']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [25352] using WatchFiles
+D:\Program Files\Python312\Lib\site-packages\pydantic\_internal\_fields.py:132: UserWarning: Field "model_version" in DiagnoseImageResponse has conflict with protected namespace "model_".
+
+You may be able to resolve this warning by setting `model_config['protected_namespaces'] = ()`.
+  warnings.warn(
+INFO:     Started server process [4728]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

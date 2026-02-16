@@ -365,32 +365,50 @@ def _load_model():
         return _model
 
     model_path = Path(settings.classifier_model_path)
+    print(f"DEBUG: Attempting to load model from: {model_path}", flush=True)
+    
     if not model_path.exists():
-        logger.warning("Model file not found at %s — will use GPT-4o Vision", model_path)
+        print(f"DEBUG: Model file not found at {model_path}", flush=True)
         return None
 
     try:
         import torch
         import torchvision.transforms as T
         from torchvision import models
+        print(f"DEBUG: Torch imported. CUDA: {torch.cuda.is_available()}", flush=True)
 
         _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        num_classes = len(DISEASE_DATABASE)
+        
+        # Determine correct number of classes from labels file
+        labels = _load_class_labels()
+        if labels:
+            num_classes = len(labels)
+            print(f"DEBUG: Using {num_classes} classes from class_labels.json", flush=True)
+        else:
+            num_classes = len(DISEASE_DATABASE)
+            print(f"DEBUG: Using {num_classes} classes from database keys (fallback)", flush=True)
+
+        # Re-create architecture
         model = models.efficientnet_b0(weights=None)
         model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, num_classes)
+        
+        # Load weights
         state_dict = torch.load(str(model_path), map_location=_device, weights_only=True)
         model.load_state_dict(state_dict)
         model.to(_device)
         model.eval()
+        
         _transforms = T.Compose([
-            T.Resize((224, 224)), T.ToTensor(),
+            T.Resize(256),
+            T.CenterCrop(224),
+            T.ToTensor(),
             T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
         _model = model
-        logger.info("Classifier model loaded (%d classes)", num_classes)
+        print(f"DEBUG: Classifier model loaded successfully ({num_classes} classes)", flush=True)
         return _model
     except Exception as e:
-        logger.error("Failed to load classifier model: %s", str(e))
+        print(f"DEBUG: Failed to load classifier model: {e}", flush=True)
         return None
 
 
@@ -420,8 +438,19 @@ async def _openai_vision_classify(image_data: bytes, request_id: str) -> Diagnos
     elif image_data[:4] == b'RIFF':
         mime = "image/webp"
 
+    api_key = settings.openai_api_key
+    base_url = OPENAI_VISION_URL
+    model = settings.openai_model
+
+    # Prioritize Grok if available
+    if settings.grok_api_key:
+        logger.info("[%s] Using Grok Vision (xAI)", request_id)
+        api_key = settings.grok_api_key
+        base_url = f"{settings.grok_base_url}/chat/completions"
+        model = settings.grok_model  # grok-2-latest supports vision
+    
     payload = {
-        "model": settings.openai_model,
+        "model": model,
         "messages": [
             {"role": "system", "content": VISION_SYSTEM_PROMPT},
             {
@@ -438,8 +467,8 @@ async def _openai_vision_classify(image_data: bytes, request_id: str) -> Diagnos
 
     async with httpx.AsyncClient(timeout=VISION_TIMEOUT) as client:
         response = await client.post(
-            OPENAI_VISION_URL, json=payload,
-            headers={"Authorization": f"Bearer {settings.openai_api_key}", "Content-Type": "application/json"},
+            base_url, json=payload,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         )
         response.raise_for_status()
 
@@ -524,15 +553,20 @@ async def classify_image(
     model = _load_model()
     if model is not None:
         try:
-            return await _real_inference(image_data, request_id)
+            result = await _real_inference(image_data, request_id)
+            # If local model is confident, return result
+            if "Low Confidence" not in result.top_disease:
+                return result
+            
+            logger.warning("[%s] Local model low confidence, falling back to Vision API", request_id)
         except Exception as e:
             logger.error("[%s] Model inference failed: %s", request_id, str(e))
 
-    if settings.openai_api_key and not settings.mock_ai_responses:
+    if (settings.openai_api_key or settings.grok_api_key) and not settings.mock_ai_responses:
         try:
             return await _openai_vision_classify(image_data, request_id)
         except Exception as e:
-            logger.error("[%s] GPT-4o Vision failed: %s", request_id, str(e))
+            logger.error("[%s] Vision API failed: %s", request_id, str(e))
 
     logger.warning("[%s] All classifiers failed, using demo fallback", request_id)
     return _demo_classify(filename, request_id)
@@ -541,6 +575,7 @@ async def classify_image(
 async def _real_inference(image_data: bytes, request_id: str) -> DiagnoseImageResponse:
     """Run actual PyTorch model inference."""
     import torch
+    import io
     from PIL import Image
 
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
@@ -551,6 +586,13 @@ async def _real_inference(image_data: bytes, request_id: str) -> DiagnoseImageRe
         probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
 
     labels = _load_class_labels()
+    # "PlantVillage" is a garbage class (index 2 in 19-class model). Filter it out.
+    garbage_indices = [k for k, v in labels.items() if v == "PlantVillage"]
+    if garbage_indices:
+        for idx in garbage_indices:
+            probabilities[int(idx)] = 0.0
+
+    # Get top predictions
     top_k = min(3, len(labels))
     top_probs, top_indices = torch.topk(probabilities, top_k)
 
@@ -560,6 +602,20 @@ async def _real_inference(image_data: bytes, request_id: str) -> DiagnoseImageRe
         predictions.append(_build_prediction(class_key, float(prob)))
 
     top = predictions[0]
+    
+    # Low confidence handling
+    if top.confidence < 0.40:
+        logger.warning("[%s] Low confidence (%.1f%%) for %s - marking as Unidentified", 
+                       request_id, top.confidence * 100, top.disease_name)
+        return DiagnoseImageResponse(
+            predictions=predictions,
+            top_disease="Unidentified (Low Confidence)",
+            top_confidence=top.confidence,
+            treatment="The disease could not be identified with high certainty. Please try uploading a clearer image of the affected leaf.",
+            pesticide="N/A",
+            model_version="v1.0-efficientnet",
+        )
+
     return DiagnoseImageResponse(
         predictions=predictions, top_disease=top.disease_name,
         top_confidence=top.confidence, treatment=top.treatment,

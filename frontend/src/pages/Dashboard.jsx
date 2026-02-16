@@ -6,7 +6,7 @@ import ImageUpload from '../components/ImageUpload'
 import DiagnosisCard from '../components/DiagnosisCard'
 import VendorList from '../components/VendorList'
 import MapView from '../components/MapView'
-import { DemoBanner, DemoButton, PresentationMode } from '../components/DemoMode'
+import { DemoButton } from '../components/DemoMode'
 import { findVendors } from '../services/api'
 import './Dashboard.css'
 
@@ -50,7 +50,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      <DemoBanner />
+
       <nav className="dash-nav">
         <div className="dash-brand" onClick={() => navigate('/')}>
           <span className="dash-icon">🌾</span>
@@ -63,7 +63,7 @@ export default function Dashboard() {
             { id: 'camera', icon: '📸', label: 'Scan' },
             { id: 'results', icon: '🔬', label: 'Results' },
             { id: 'vendors', icon: '📍', label: 'Vendors' },
-            { id: 'demo', icon: '🎬', label: 'Demo' },
+
           ].map((tab) => (
             <button
               key={tab.id}
@@ -129,13 +129,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {activeTab === 'demo' && (
-          <div className="dash-panel">
-            <h2 className="panel-title">🎬 Presentation Mode</h2>
-            <p className="panel-desc">Auto-run the full farmer diagnosis pipeline for judges</p>
-            <PresentationMode sessionId={sessionId} location={location} />
-          </div>
-        )}
+
       </main>
     </div>
   )

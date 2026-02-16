@@ -61,6 +61,14 @@ INTENT_KEYWORDS = {
                "help", "shuruaat", "start"],
         "en": ["hello", "hi", "hey", "namaste", "help", "start", "begin"],
     },
+    "identity": {
+        "hi": ["kaun ho", "tumhara naam", "kya karte ho", "krishi sarthi", "antigravity"],
+        "en": ["who are you", "your name", "what do you do", "krishi sarthi", "antigravity"],
+    },
+    "small_talk": {
+        "hi": ["kaise ho", "kaisa hai", "thik ho", "good morning", "shubh prabhat", "dhanyavad", "shukriya"],
+        "en": ["how are you", "doing well", "good morning", "good evening", "thank", "thanks"],
+    },
 }
 
 
@@ -237,12 +245,24 @@ Be empathetic, supportive, and practical. Remember: many farmers have limited fo
     ])
 
     # ── Create agent ──────────────────────────────
-    llm = ChatOpenAI(
-        model=settings.openai_model,
-        api_key=settings.openai_api_key,
-        temperature=0.3,
-        max_tokens=1500,
-    )
+    # ── Create agent ──────────────────────────────
+    if settings.grok_api_key:
+        llm = ChatOpenAI(
+            base_url=settings.grok_base_url,
+            api_key=settings.grok_api_key,
+            model=settings.grok_model,
+            temperature=0.3,
+            max_tokens=1500,
+            request_timeout=10,
+        )
+    else:
+        llm = ChatOpenAI(
+            model=settings.openai_model,
+            api_key=settings.openai_api_key,
+            temperature=0.3,
+            max_tokens=1500,
+            request_timeout=10,
+        )
 
     agent = create_openai_tools_agent(llm, tools, prompt)
     executor = AgentExecutor(
@@ -368,57 +388,50 @@ async def _run_rule_based_agent(
             logger.error("[%s] Classifier failed: %s", request_id, str(e))
             reply_parts.append("❌ रोग की पहचान में समस्या हुई। कृपया फिर से कोशिश करें।")
 
-    # ── Handle treatment queries ──────────────────
-    if intent in ("disease_diagnosis", "treatment_advice"):
+    # ── Handle general questions (fallback to RAG) ──
+    if intent in ("general_question", "treatment_advice") or (intent == "disease_diagnosis" and not diagnosis_data):
         try:
             from app.services.rag_service import search_knowledge
-            knowledge_results = await search_knowledge(query=message, top_k=2, request_id=request_id)
+            # Use the full message as query
+            query = message
+            if crop and crop not in query.lower():
+                query = f"{crop} {query}"
+            
+            knowledge_results = await search_knowledge(
+                query=query, 
+                top_k=2, 
+                request_id=request_id,
+                crop=crop
+            )
 
-            if knowledge_results and knowledge_results[0].relevance_score > 0.1:
+            if knowledge_results and knowledge_results[0].relevance_score > 0.05: # Lower threshold for general queries
                 top_result = knowledge_results[0]
                 sources.append(top_result.title)
-
-                if intent != "disease_diagnosis":  # Avoid duplicate info
-                    reply_parts.append(
-                        f"\n📚 **{top_result.title}:**\n{top_result.content}"
-                    )
-                elif len(knowledge_results) > 1:
+                
+                reply_parts.append(
+                    f"📚 **जानकारी / Information:**\n"
+                    f"{top_result.content}"
+                )
+                
+                if len(knowledge_results) > 1:
                     second = knowledge_results[1]
-                    sources.append(second.title)
-                    reply_parts.append(
-                        f"\n📚 **अतिरिक्त जानकारी / Additional Info:**\n"
-                        f"*{second.title}*\n{second.content[:300]}..."
-                    )
+                    if second.relevance_score > 0.1:
+                        sources.append(second.title)
+                        reply_parts.append(
+                            f"\n\n**और जानकारी / More Info:**\n"
+                            f"{second.content[:300]}..."
+                        )
+            elif crop:
+                # No relevant results found FOR THIS CROP
+                reply_parts.append(
+                    f"क्षमा करें, मेरे पास **{crop}** की इस बीमारी के बारे में अभी जानकारी नहीं है।\n"
+                    f"Sorry, I don't have specific information about this **{crop}** disease yet."
+                )
         except Exception as e:
             logger.error("[%s] RAG search failed: %s", request_id, str(e))
 
-    # ── Handle vendor search ──────────────────────
-    if intent == "vendor_search" or (intent == "disease_diagnosis" and latitude and longitude):
-        try:
-            from app.services.vendor_service import search_vendors
-            lat = latitude or 30.9  # Default to Ludhiana if no location
-            lng = longitude or 75.85
-
-            vendor_data = await search_vendors(
-                latitude=lat, longitude=lng,
-                query="pesticide agricultural supply",
-                radius_km=10.0, request_id=request_id,
-            )
-
-            if vendor_data.vendors:
-                vendor_text = "\n📍 **नज़दीकी दुकानें / Nearby Shops:**\n"
-                for i, v in enumerate(vendor_data.vendors[:3], 1):
-                    vendor_text += (
-                        f"\n{i}. **{v.name}** — {v.distance_km} km\n"
-                        f"   📞 {v.phone or 'N/A'} | ⭐ {v.rating or 'N/A'}\n"
-                        f"   📫 {v.address}\n"
-                    )
-                reply_parts.append(vendor_text)
-        except Exception as e:
-            logger.error("[%s] Vendor search failed: %s", request_id, str(e))
-
     # ── Handle greeting ───────────────────────────
-    if intent == "greeting" or not reply_parts:
+    if intent == "greeting":
         greeting = (
             "🙏 **नमस्ते! मैं कृषि-सारथी हूँ — आपका AI कृषि सहायक।**\n\n"
             "मैं आपकी मदद कर सकता हूँ:\n"
@@ -428,10 +441,30 @@ async def _run_rule_based_agent(
             "📍 **नज़दीकी दुकान** — कीटनाशक दुकान ढूंढें\n\n"
             "आप हिंदी या अंग्रेज़ी में बात कर सकते हैं! 🌾"
         )
-        if intent == "greeting":
-            reply_parts = [greeting]
-        else:
-            reply_parts.insert(0, greeting)
+        reply_parts.insert(0, greeting)
+    
+    # ── Handle identity ───────────────────────────
+    if intent == "identity":
+        reply_parts.append(
+            "मैं **कृषि-सारथी** हूँ, एक AI सिस्टम जो Google DeepMind और Antigravity टीम द्वारा बनाया गया है।\n"
+            "मेरा उद्देश्य किसानों की मदद करना है। 🚜\n\n"
+            "I am **Krishi-Sarthi**, an AI assistant designed to help farmers with crop diagnosis and advice."
+        )
+
+    # ── Handle small talk ─────────────────────────
+    if intent == "small_talk":
+        reply_parts.append(
+            "मैं बिल्कुल ठीक हूँ! पूछने के लिए धन्यवाद। 😊\n"
+            "बताइये, आज मैं आपकी खेती में कैसे मदद कर सकता हूँ?\n\n"
+            "I am doing great, thanks for asking! How can I help with your crops today?"
+        )
+    
+    # ── Final Fallback ────────────────────────────
+    if not reply_parts:
+        reply_parts.append(
+            "क्षमा करें, मैं समझ नहीं पाया। कृपया फसल की बीमारी, इलाज, या दुकान के बारे में पूछें।\n"
+            "Sorry, I didn't understand. Please ask about crop diseases, remedies, or nearby shops."
+        )
 
     reply = "\n\n---\n\n".join(reply_parts)
 
@@ -543,7 +576,8 @@ async def run_agent(
     )
 
     # ── Try LangChain agent ───────────────────────
-    if not settings.is_demo and settings.openai_api_key:
+    # ── Try LangChain agent ───────────────────────
+    if not settings.is_demo and (settings.openai_api_key or settings.grok_api_key):
         try:
             logger.info("[%s] Using LangChain agent (GPT-4)", request_id)
             return await _run_langchain_agent(

@@ -46,14 +46,14 @@ export default function Home() {
             <span className="btn-icon">🔬</span>
             Start Diagnosis
           </button>
-          <button className="btn-secondary" onClick={() => navigate('/dashboard')}>
-            <span className="btn-icon">🎯</span>
-            Try Demo
+          <button className="btn-secondary" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}>
+            <span className="btn-icon">📖</span>
+            Learn More
           </button>
         </div>
         <div className="hero-stats">
           <div className="stat">
-            <span className="stat-value">15+</span>
+            <span className="stat-value">30+</span>
             <span className="stat-label">Crop Diseases</span>
           </div>
           <div className="stat">

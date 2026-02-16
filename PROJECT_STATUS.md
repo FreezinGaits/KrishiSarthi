@@ -84,6 +84,10 @@ When you upload a crop image:
 
 **Fallback chain**: Local PyTorch model (if trained) → GPT-4o Vision API → Demo mock data
 
+**Important Note**: If GPT-4o Vision fails (e.g. quota exceeded) and the system falls back to demo mode:
+- If filename contains a crop keyword (e.g. "tomato_leaf.jpg"), it returns a relevant disease.
+- If filename is unknown (e.g. "image.jpg"), it returns **"Unidentified (Demo Mode)"** instead of guessing randomly. This prevents misleading results.
+
 **Limitations**:
 - Accuracy depends entirely on GPT-4o Vision's ability to identify crop diseases — it's good but not infallible
 - No local PyTorch model is trained yet (the training script exists but hasn't been run)
