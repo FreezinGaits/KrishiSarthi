@@ -66,6 +66,10 @@ export async function findVendors(lat, lng, query = 'pesticide shop', radiusKm =
   })
 }
 
+export async function deleteSession(sessionId) {
+  return request(`/sessions/${sessionId}`, { method: 'DELETE' });
+}
+
 export async function getHealth() {
   return request('/health');
 }

@@ -60,6 +60,13 @@
 }
 .tab-icon { font-size: 1.1rem; }
 
+/* ── Body: sidebar + main ── */
+.dash-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
 /* ── Main area ── */
 .dash-main {
   flex: 1;

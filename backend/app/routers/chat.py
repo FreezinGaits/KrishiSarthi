@@ -114,6 +114,25 @@ VENDOR_KEYWORDS = ["dukaan", "shop", "vendor", "kharidna", "buy", "price", "keem
 GREETING_KEYWORDS = ["namaste", "hello", "hi", "namaskar", "kaise", "how", "help", "madad", "sahayata"]
 
 
+# ── Session Management Endpoints ──────────────────
+
+@router.get("/sessions", summary="List all active chat sessions")
+async def list_sessions():
+    """Return a list of all active session IDs from the memory store."""
+    from app.services.memory_service import memory_service
+    session_ids = memory_service.list_sessions()
+    return {"sessions": session_ids}
+
+
+@router.delete("/sessions/{session_id}", summary="Delete a chat session")
+async def delete_session(session_id: str):
+    """Clear the chat history for the given session."""
+    from app.services.memory_service import memory_service
+    memory_service.clear_history(session_id)
+    logger.info("Deleted session %s", session_id[:8])
+    return {"status": "deleted", "session_id": session_id}
+
+
 @router.post(
     "/chat",
     response_model=ChatResponse,

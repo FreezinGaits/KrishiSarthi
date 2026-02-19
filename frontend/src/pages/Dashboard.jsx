@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import useChatSessions from '../hooks/useChatSessions'
+import ChatSidebar from '../components/ChatSidebar'
 import ChatInterface from '../components/ChatInterface'
 import VoiceRecorder from '../components/VoiceRecorder'
 import ImageUpload from '../components/ImageUpload'
@@ -15,21 +17,32 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('chat')
   const [diagnosis, setDiagnosis] = useState(null)
   const [vendors, setVendors] = useState([])
-  const [vendorStatus, setVendorStatus] = useState('idle') // idle | loading | loaded | error
+  const [vendorStatus, setVendorStatus] = useState('idle')
   const [matchedDisease, setMatchedDisease] = useState(null)
   const [location, setLocation] = useState(null)
-  const [sessionId] = useState(() => `session-${Date.now()}`)
   const [chatInput, setChatInput] = useState('')
   const chatRef = useRef()
+
+  // ── Multi-session hook ──
+  const {
+    sessions,
+    activeSession,
+    activeId,
+    createSession,
+    switchSession,
+    deleteSession,
+    renameSession,
+    addMessage,
+    setActiveMessages,
+  } = useChatSessions()
 
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
       (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => setLocation({ lat: 30.9, lng: 75.85 }) // Default: Ludhiana
+      () => setLocation({ lat: 30.9, lng: 75.85 })
     )
   }, [])
 
-  // Fetch vendors — re-runs when location or diagnosis changes
   function fetchVendors(disease = null) {
     if (!location) return
     setVendorStatus('loading')
@@ -47,7 +60,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (location) {
-      // If we already have a diagnosis, filter vendors by disease
       const diseaseClass = diagnosis?.class_name || diagnosis?.disease || null
       fetchVendors(diseaseClass)
     }
@@ -63,20 +75,14 @@ export default function Dashboard() {
 
   function handleDiagnosis(data, meta = {}) {
     setDiagnosis(data)
-
-    // Re-fetch vendors filtered by the diagnosed disease
     const diseaseClass = data?.class_name || data?.disease || null
     if (diseaseClass && location) {
       fetchVendors(diseaseClass)
     }
-
-    // Only switch to the Results tab automatically when diagnosis came from the
-    // ImageUpload (camera / file) or when explicitly requested.
     if (meta.from === 'image' || meta.autoOpen === true) {
       setActiveTab('results')
     }
   }
-
 
   return (
     <div className="dashboard">
@@ -93,7 +99,6 @@ export default function Dashboard() {
             { id: 'camera', icon: '📸', label: 'Scan' },
             { id: 'results', icon: '🔬', label: 'Results' },
             { id: 'vendors', icon: '📍', label: 'Vendors' },
-
           ].map((tab) => (
             <button
               key={tab.id}
@@ -103,84 +108,87 @@ export default function Dashboard() {
               <span className="tab-icon">{tab.icon}</span>
               <span className="tab-label">{tab.label}</span>
             </button>
-
-          ))
-}
+          ))}
         </div>
       </nav>
-      <button className="dash-reset-btn" onClick={() => {
-        // call child reset via ref
-        if (chatRef.current?.sendMessage) {
-          // trigger ChatInterface to reset by calling a new exposed method if you added one;
-          // simpler: clear localStorage and reload page:
-          localStorage.removeItem('chat_history');
-          localStorage.removeItem('chat_session_id');
-          window.location.reload();
-        }
-      }}>
-        New Chat
-      </button>
 
-      <main className="dash-main">
-        {activeTab === 'chat' && (
-          <ChatInterface
-            ref={chatRef}
-            sessionId={sessionId}
-            location={location}
-            initialInput={chatInput}
-            onDiagnosis={handleDiagnosis}
-          />
-        )}
+      <div className="dash-body">
+        {/* ── Chat Sidebar (only visible on Chat tab) ── */}
+        {activeTab === 'chat' && <ChatSidebar
+          sessions={sessions}
+          activeId={activeId}
+          onCreateSession={createSession}
+          onSwitchSession={(id) => {
+            switchSession(id)
+            setActiveTab('chat')
+          }}
+          onDeleteSession={deleteSession}
+          onRenameSession={renameSession}
+        />}
 
-        {activeTab === 'voice' && (
-          <div className="dash-panel">
-            <h2 className="panel-title">🎤 Voice Input</h2>
-            <p className="panel-desc">हिंदी या English में बोलें — AI समझेगा</p>
-            <VoiceRecorder onTranscript={handleTranscript} />
-          </div>
-        )}
+        {/* ── Main Content ── */}
+        <main className="dash-main">
+          {activeTab === 'chat' && (
+            <ChatInterface
+              ref={chatRef}
+              messages={activeSession?.messages || []}
+              sessionId={activeId}
+              location={location}
+              initialInput={chatInput}
+              onDiagnosis={handleDiagnosis}
+              onAddMessage={addMessage}
+              onSetMessages={setActiveMessages}
+            />
+          )}
 
-        {activeTab === 'camera' && (
-          <div className="dash-panel">
-            <h2 className="panel-title">📸 Crop Photo Scan</h2>
-            <p className="panel-desc">फसल की फोटो अपलोड करें — AI बीमारी पहचानेगा</p>
-            <ImageUpload onDiagnosis={handleDiagnosis} />
-          </div>
-        )}
-
-        {activeTab === 'results' && (
-          <div className="dash-panel">
-            <h2 className="panel-title">🔬 Diagnosis Results</h2>
-            <DemoButton onDiagnosis={handleDiagnosis} sessionId={sessionId} location={location} />
-            {diagnosis ? (
-              <DiagnosisCard data={diagnosis} />
-            ) : (
-              <div className="empty-state">
-                <span className="empty-icon">🌱</span>
-                <p>No diagnosis yet. Upload a crop photo or click "Run Demo" above.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'vendors' && (
-          <div className="dash-panel vendors-panel">
-            <h2 className="panel-title">📍 {matchedDisease ? 'Recommended Vendors' : 'Nearby Vendors'}</h2>
-            {matchedDisease && (
-              <div className="disease-vendor-banner">
-                <span>🎯 Showing vendors with pesticides for <strong>{matchedDisease.replace(/___/g, ' – ').replace(/_/g, ' ')}</strong></span>
-                <button className="btn-show-all" onClick={() => fetchVendors(null)}>Show All</button>
-              </div>
-            )}
-            <div className="vendors-layout">
-              <VendorList vendors={vendors} status={vendorStatus} matchedDisease={matchedDisease} />
-              <MapView vendors={vendors} center={location} />
+          {activeTab === 'voice' && (
+            <div className="dash-panel">
+              <h2 className="panel-title">🎤 Voice Input</h2>
+              <p className="panel-desc">हिंदी या English में बोलें — AI समझेगा</p>
+              <VoiceRecorder onTranscript={handleTranscript} />
             </div>
-          </div>
-        )}
+          )}
 
+          {activeTab === 'camera' && (
+            <div className="dash-panel">
+              <h2 className="panel-title">📸 Crop Photo Scan</h2>
+              <p className="panel-desc">फसल की फोटो अपलोड करें — AI बीमारी पहचानेगा</p>
+              <ImageUpload onDiagnosis={handleDiagnosis} />
+            </div>
+          )}
 
-      </main>
+          {activeTab === 'results' && (
+            <div className="dash-panel">
+              <h2 className="panel-title">🔬 Diagnosis Results</h2>
+              <DemoButton onDiagnosis={handleDiagnosis} sessionId={activeId} location={location} />
+              {diagnosis ? (
+                <DiagnosisCard data={diagnosis} />
+              ) : (
+                <div className="empty-state">
+                  <span className="empty-icon">🌱</span>
+                  <p>No diagnosis yet. Upload a crop photo or click "Run Demo" above.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'vendors' && (
+            <div className="dash-panel vendors-panel">
+              <h2 className="panel-title">📍 {matchedDisease ? 'Recommended Vendors' : 'Nearby Vendors'}</h2>
+              {matchedDisease && (
+                <div className="disease-vendor-banner">
+                  <span>🎯 Showing vendors with pesticides for <strong>{matchedDisease.replace(/___/g, ' – ').replace(/_/g, ' ')}</strong></span>
+                  <button className="btn-show-all" onClick={() => fetchVendors(null)}>Show All</button>
+                </div>
+              )}
+              <div className="vendors-layout">
+                <VendorList vendors={vendors} status={vendorStatus} matchedDisease={matchedDisease} />
+                <MapView vendors={vendors} center={location} />
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }

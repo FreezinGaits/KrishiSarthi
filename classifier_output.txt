@@ -2,4 +2,4 @@
 Top Disease: Unidentified (Demo Mode)
 Confidence: 0.0000
 Model Version: v1.0-demo-fallback
-Predictions: []
+Predictions: [] 

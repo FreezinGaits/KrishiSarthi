@@ -193,15 +193,15 @@ if RAG_AVAILABLE and os.path.isdir(FAISS_INDEX_DIR):
 
         RULES:
 
-        1. If image analysis is present in context, ALWAYS use it.
-        2. If user greets (hi, hello, namaste, namaskar), respond politely in a farming tone.
-        3. If user asks about the uploaded image, base your answer on IMAGE ANALYSIS RESULT first.
+        1. If IMAGE ANALYSIS RESULT is present in context, ALWAYS use it to answer.
+        2. If NO IMAGE ANALYSIS RESULT is in context, do NOT mention any image or image analysis.
+        3. If user greets (hi, hello, namaste, namaskar), respond politely in a farming tone.
         4. If context insufficient, use agricultural knowledge.
-        5. Never hallucinate unknown image sources.
-        6. ALWAYS respond in English. Translation to the user's language is handled separately.
-        7. Be concise and practical — farmers need actionable advice.
-        8. The user may be an Indian farmer asking in Hindi or Hinglish (Hindi written in English letters).
-           The question has been translated to English for you. Answer naturally in English.
+        5. NEVER hallucinate or make up image analysis results.
+        6. Be concise and practical — farmers need actionable advice.
+
+        LANGUAGE INSTRUCTION:
+        {response_language}
 
         Response format when disease identified:
 
@@ -224,7 +224,7 @@ if RAG_AVAILABLE and os.path.isdir(FAISS_INDEX_DIR):
 
         Answer:
         """,
-            input_variables=["context", "question"]
+            input_variables=["context", "question", "response_language"]
         )
 
 
@@ -356,7 +356,10 @@ async def chat(req: ChatRequest):
         "what did i ask",
         "what was my",
         "most recent question",
-        "what i just asked"
+        "what i just asked",
+        "pichla sawal",
+        "maine kya pucha",
+        "mera pichla"
     ]
 
     is_meta_question = any(trigger in lower_msg for trigger in meta_triggers)
@@ -390,7 +393,7 @@ async def chat(req: ChatRequest):
         if len(session_memory[req.session_id]) > 20:
             session_memory[req.session_id] = session_memory[req.session_id][-20:]
 
-        return {"reply": reply_text, "diagnosis": None, "vendors": []}
+        return {"reply": reply_text, "diagnosis": None, "vendors": [], "detected_language": detected_lang}
     # history = session_memory.get(req.session_id, [])
     # history.append({"role": "user", "content": reply_text})
     # session_memory[req.session_id] = history
@@ -461,10 +464,20 @@ async def chat(req: ChatRequest):
                     for m in session_memory[req.session_id][-10:]
                 )
                 # 3️⃣ Build prompt
-                # Use English message in the prompt for best LLM quality
+                # Build language instruction for the LLM
+                lang_instructions = {
+                    "hi": "You MUST respond entirely in Hindi (Devanagari script). Use Hindi agricultural terms. Do NOT respond in English.",
+                    "hinglish": "You MUST respond in Hinglish (Hindi words written in Roman/Latin script, mixed with English). Example: 'Aapke tamatar ki pattiyon mein Early Blight rog hai. Iske liye Mancozeb spray karein.' Do NOT use Devanagari script.",
+                    "en": "Respond in English."
+                }
+                response_lang_instruction = lang_instructions.get(detected_lang, lang_instructions["en"])
+
+                # Pass the ORIGINAL user message (Hindi/Hinglish/English) so LLM sees the real question
+                # Use english_message only for RAG retrieval (already done above)
                 final_prompt = prompt_template.invoke({
                     "context": full_context + "\n\nConversation History:\n" + history_text,
-                    "question": english_message
+                    "question": req.message,
+                    "response_language": response_lang_instruction
                 })
 
                 llm_resp = llm.invoke(final_prompt)
@@ -516,12 +529,7 @@ async def chat(req: ChatRequest):
             radius_km=100  # wider radius for disease-matched vendors
         )
 
-    # ── Translate response back to user's language ──
-    if detected_lang != "en" and reply_text:
-        translated_reply = translate_from_english(reply_text, detected_lang)
-        print(f"[LANG] Translated reply to {detected_lang}: {translated_reply[:80]}")
-    else:
-        translated_reply = reply_text
+    # No post-translation needed — LLM responds directly in detected language
 
     # Save assistant reply (store original English for context)
     session_memory[req.session_id].append({
@@ -533,7 +541,7 @@ async def chat(req: ChatRequest):
     if len(session_memory[req.session_id]) > 20:
         session_memory[req.session_id] = session_memory[req.session_id][-20:]
     return {
-        "reply": translated_reply,
+        "reply": reply_text,
         "diagnosis": diagnosis,
         "vendors": vendors,
         "detected_language": detected_lang

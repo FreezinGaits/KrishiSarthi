@@ -1,104 +1,86 @@
 import { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react'
-import { chatWithAgent, diagnoseImage } from '../services/api'
+import { chatWithAgent } from '../services/api'
 import DiagnosisCard from './DiagnosisCard'
 import './ChatInterface.css'
 
-const DEFAULT_WELCOME = {
-  role: 'assistant',
-  text:
-    'नमस्ते! मैं कृषि-सारथी हूँ 🌾\nमैं आपकी फसल की बीमारी पहचानने, इलाज बताने और नज़दीकी दुकान खोजने में मदद कर सकता हूँ।\n\nHow can I help you today?',
-}
-
-const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, initialInput, onDiagnosis }, ref) {
-  const [messages, setMessages] = useState(() => {
-    const saved = localStorage.getItem('chat_history')
-    return saved ? JSON.parse(saved) : [DEFAULT_WELCOME]
-  })
+/**
+ * ChatInterface — controlled chat component.
+ *
+ * Props:
+ *   messages        — array of { role, text, image_preview?, diagnosis? }
+ *   sessionId       — current session id string
+ *   location        — { lat, lng } or null
+ *   initialInput    — pre-filled text input
+ *   onDiagnosis     — callback(data, meta) when diagnosis received
+ *   onAddMessage    — callback(role, text, extra) to add message to session
+ *   onSetMessages   — callback(msgs) to replace all messages (for reset)
+ */
+const ChatInterface = forwardRef(function ChatInterface(
+  { messages, sessionId, location, initialInput, onDiagnosis, onAddMessage, onSetMessages },
+  ref
+) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [answerLength, setAnswerLength] = useState('medium') // short | medium | long
+  const [answerLength, setAnswerLength] = useState('medium')
   const bottomRef = useRef()
   const fileRef = useRef()
-  const [currentSessionId, setCurrentSessionId] = useState(() => sessionId || localStorage.getItem('chat_session_id') || `session-${Date.now()}`)
   const [pendingImage, setPendingImage] = useState(null)
   const [pendingPreview, setPendingPreview] = useState(null)
-  
-  // persist messages & session id
-  useEffect(() => { localStorage.setItem('chat_history', JSON.stringify(messages)) }, [messages])
-  useEffect(() => { if (currentSessionId) localStorage.setItem('chat_session_id', currentSessionId) }, [currentSessionId])
+
   useEffect(() => { if (initialInput) setInput(initialInput) }, [initialInput])
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
-  useImperativeHandle(ref, () => ({ sendMessage: (text) => { doSend(text) } }))
-
-  function resetChat() {
-    const newSession = `session-${Date.now()}`
-    setMessages([DEFAULT_WELCOME])
-    setInput('')
-    setCurrentSessionId(newSession)
-  
-    // clear stored image
+  // Reset pending image when session changes
+  useEffect(() => {
     setPendingImage(null)
     setPendingPreview(null)
-  
-    localStorage.removeItem('chat_history')
-    localStorage.setItem('chat_session_id', newSession)
-  }
-  
+  }, [sessionId])
+
+  useImperativeHandle(ref, () => ({
+    sendMessage: (text) => doSend(text),
+  }))
 
   async function doSend(text) {
     const msg = (text || input).trim()
     if (!msg) return
     setInput('')
-    setMessages((prev) => [...prev, { role: 'user', text: msg }])
+    onAddMessage('user', msg)
     setLoading(true)
 
     try {
-      const activeSessionId = currentSessionId
-      // pass answer length preference to backend. Backend may ignore if not implemented.
       const res = await chatWithAgent(
         msg,
-        activeSessionId,
-        pendingImage, // send stored image
+        sessionId,
+        pendingImage,
         location?.lat,
         location?.lng,
         'hi',
         { answer_length: answerLength }
       )
-      
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          text: res.reply || 'कोई जवाब नहीं मिला।',
-          diagnosis: res.diagnosis,
-          vendors: res.vendors,
-        },
-      ])
+
+      onAddMessage('assistant', res.reply || 'कोई जवाब नहीं मिला।', {
+        diagnosis: res.diagnosis,
+        vendors: res.vendors,
+      })
+
       if (res.diagnosis && onDiagnosis) {
-        // indicate origin is chat so Dashboard doesn't auto-open Results
         onDiagnosis(res.diagnosis, { from: 'chat' })
       }
-      // clear image after sending
-      // setPendingImage(null)
-      // setPendingPreview(null)
-
     } catch (e) {
       console.error(e)
-      setMessages((prev) => [...prev, { role: 'assistant', text: '⚠️ Error connecting to server. Please try again.' }])
+      onAddMessage('assistant', '⚠️ Error connecting to server. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
-  // file / camera upload handler in-chat
   function openFilePicker() { fileRef.current?.click() }
 
   async function handleFileInput(e) {
     const file = e.target.files?.[0]
     if (!file) return
     await sendImageInChat(file)
-    e.target.value = '' // reset
+    e.target.value = ''
   }
 
   async function sendImageInChat(file) {
@@ -109,34 +91,25 @@ const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, i
         reader.onerror = rej
         reader.readAsDataURL(file)
       })
-  
+
       const previewUrl = URL.createObjectURL(file)
-  
-      // store image but DO NOT send yet
       setPendingImage(b64)
       setPendingPreview(previewUrl)
-  
-      setMessages((prev) => [
-        ...prev,
-        { role: 'user', text: '📷 Image uploaded', image_preview: previewUrl },
-        { role: 'assistant', text: 'Image received 🌿\nWhat would you like to know about this crop?' }
-      ])
+
+      onAddMessage('user', '📷 Image uploaded', { image_preview: previewUrl })
+      onAddMessage('assistant', 'Image received 🌿\nWhat would you like to know about this crop?')
     } catch (e) {
       console.error(e)
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', text: '⚠️ Failed to process image.' }
-      ])
+      onAddMessage('assistant', '⚠️ Failed to process image.')
     }
   }
-  
 
   return (
     <div className="chat-container">
-      {/* Chat header with controls */}
+      {/* Chat header */}
       <div className="chat-header">
         <div className="chat-controls-left">
-          <button className="btn-reset" onClick={resetChat} title="Start new chat">🔁 New Chat</button>
+          {/* New Chat button removed — now handled by sidebar */}
         </div>
         <div className="chat-controls-right">
           <label className="answer-length">
@@ -156,15 +129,20 @@ const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, i
             <div className="msg-avatar">{m.role === 'user' ? '👨‍🌾' : '🤖'}</div>
             <div className="msg-bubble">
               <div className="msg-text">
-                {m.image_preview && <img src={m.image_preview} alt="preview" style={{ maxWidth: 220, borderRadius: 6, marginBottom: 6 }} />}
+                {m.image_preview && (
+                  <img
+                    src={m.image_preview}
+                    alt="preview"
+                    style={{ maxWidth: 220, borderRadius: 6, marginBottom: 6 }}
+                  />
+                )}
                 {m.text}
               </div>
-              {m.diagnosis && 
+              {m.diagnosis &&
                 (m.diagnosis.disease || m.diagnosis.top_disease) &&
-                (m.diagnosis.disease !== 'Unknown') &&
-                (
+                m.diagnosis.disease !== 'Unknown' && (
                   <DiagnosisCard data={m.diagnosis} compact />
-              )}
+                )}
             </div>
           </div>
         ))}
@@ -178,6 +156,7 @@ const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, i
         )}
         <div ref={bottomRef} />
       </div>
+
       {pendingPreview && (
         <div style={{ padding: 8, fontSize: 14, color: '#4caf50' }}>
           📷 Image attached — will be sent with your next message
@@ -193,8 +172,6 @@ const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, i
           placeholder="अपना सवाल पूछें... / Ask your question..."
           disabled={loading}
         />
-
-        {/* File / Camera input for quick image upload */}
         <input
           ref={fileRef}
           type="file"
@@ -203,10 +180,9 @@ const ChatInterface = forwardRef(function ChatInterface({ sessionId, location, i
           onChange={handleFileInput}
           hidden
         />
-        <button type="button" className="chat-upload" onClick={openFilePicker} title="Upload photo (camera)">
+        <button type="button" className="chat-upload" onClick={openFilePicker} title="Upload photo">
           📷
         </button>
-
         <button className="chat-send" type="submit" disabled={loading || !input.trim()}>
           ➤
         </button>

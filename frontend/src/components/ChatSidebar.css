@@ -1,0 +1,179 @@
+/* ═══  Chat Sidebar  ═══ */
+
+.chat-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 15, 13, 0.95);
+  border-right: 1px solid var(--border);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--green-400);
+  letter-spacing: -0.3px;
+}
+
+.sidebar-new-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  transition: all var(--transition);
+}
+
+.sidebar-new-btn:hover {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: var(--border-hi);
+  transform: scale(1.05);
+}
+
+/* ── Session List ── */
+.sidebar-sessions {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.sidebar-session {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: all var(--transition);
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.sidebar-session:hover {
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.sidebar-session.active {
+  background: rgba(34, 197, 94, 0.1);
+  border-left-color: var(--green-500);
+  box-shadow: inset 0 0 24px rgba(34, 197, 94, 0.04);
+}
+
+/* ── Session Content ── */
+.session-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.session-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-session.active .session-name {
+  color: var(--green-300);
+}
+
+.session-time {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.session-preview {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+.session-meta {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* ── Actions (hover reveal) ── */
+.session-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.sidebar-session:hover .session-actions {
+  opacity: 1;
+}
+
+.session-action {
+  background: none;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.session-action:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.session-action.delete:hover {
+  background: rgba(239, 83, 80, 0.12);
+}
+
+/* ── Rename Input ── */
+.session-rename-input {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 1px solid var(--green-500);
+  border-radius: 6px;
+  padding: 2px 8px;
+  width: 100%;
+  outline: none;
+}
+
+/* ── Mobile: collapse sidebar ── */
+@media (max-width: 768px) {
+  .chat-sidebar {
+    display: none;
+  }
+}

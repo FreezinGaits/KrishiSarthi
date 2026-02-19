@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌾 Krishi-Sarthi — AI कृषि सहायक</title>
-    <meta name="description" content="Voice-first agentic AI assistant for farmers — crop disease diagnosis, treatment recommendations, and nearest vendor discovery.">
+    <meta name="description"
+        content="Voice-first agentic AI assistant for farmers — crop disease diagnosis, treatment recommendations, and nearest vendor discovery.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="demo.css">
 </head>
+
 <body>
     <!-- ── Header ──────────────────────────────── -->
     <header class="app-header">
@@ -60,9 +65,8 @@
                     <button class="mic-btn" id="micBtn" title="Hold to speak">
                         🎤
                     </button>
-                    <input type="text" class="chat-input" id="chatInput" 
-                           placeholder="अपना सवाल टाइप करें / Type your question..."
-                           autocomplete="off">
+                    <input type="text" class="chat-input" id="chatInput"
+                        placeholder="अपना सवाल टाइप करें / Type your question..." autocomplete="off">
                     <button class="send-btn" id="sendBtn" title="Send">
                         ➤
                     </button>
@@ -80,8 +84,19 @@
         <!-- Side Panel (Diagnosis / Vendors) -->
         <aside class="side-panel" id="sidePanel">
             <div class="side-panel-tabs">
+                <button class="tab-btn" data-tab="chats">💬 Chats</button>
                 <button class="tab-btn active" data-tab="diagnosis">🔬 Diagnosis</button>
                 <button class="tab-btn" data-tab="vendors">📍 Vendors</button>
+            </div>
+
+            <!-- Chats Tab -->
+            <div class="tab-content" id="chatsTab">
+                <div class="chats-header">
+                    <button class="new-chat-btn" onclick="sessionManager.createSession()">
+                        ➕ New Chat
+                    </button>
+                </div>
+                <div id="sessionList"></div>
             </div>
 
             <!-- Diagnosis Tab -->
@@ -141,4 +156,5 @@
 
     <script src="demo.js"></script>
 </body>
+
 </html>
