@@ -50,17 +50,20 @@ export async function chatWithAgent(message, sessionId = '', imageBase64 = null,
 }
 
 
-export async function findVendors(lat, lng, query = 'pesticide shop', radiusKm = 10) {
+export async function findVendors(lat, lng, query = 'pesticide shop', radiusKm = 50, disease = null) {
+  const body = {
+    latitude: lat,
+    longitude: lng,
+    query,
+    radius_km: radiusKm,
+  }
+  if (disease) body.disease = disease
+
   return request('/find-vendors', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      latitude: lat,
-      longitude: lng,
-      query,
-      radius_km: radiusKm,
-    }),
-  });
+    body: JSON.stringify(body),
+  })
 }
 
 export async function getHealth() {

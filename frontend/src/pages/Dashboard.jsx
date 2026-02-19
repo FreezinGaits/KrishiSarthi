@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [diagnosis, setDiagnosis] = useState(null)
   const [vendors, setVendors] = useState([])
   const [vendorStatus, setVendorStatus] = useState('idle') // idle | loading | loaded | error
+  const [matchedDisease, setMatchedDisease] = useState(null)
   const [location, setLocation] = useState(null)
   const [sessionId] = useState(() => `session-${Date.now()}`)
   const [chatInput, setChatInput] = useState('')
@@ -28,18 +29,27 @@ export default function Dashboard() {
     )
   }, [])
 
+  // Fetch vendors — re-runs when location or diagnosis changes
+  function fetchVendors(disease = null) {
+    if (!location) return
+    setVendorStatus('loading')
+    findVendors(location.lat, location.lng, 'pesticide shop', 100, disease)
+      .then((res) => {
+        setVendors(res.vendors || [])
+        setMatchedDisease(disease)
+        setVendorStatus('loaded')
+      })
+      .catch((err) => {
+        console.error('Vendor fetch failed:', err)
+        setVendorStatus('error')
+      })
+  }
+
   useEffect(() => {
     if (location) {
-      setVendorStatus('loading')
-      findVendors(location.lat, location.lng, 'pesticide shop', 50)
-        .then((res) => {
-          setVendors(res.vendors || [])
-          setVendorStatus('loaded')
-        })
-        .catch((err) => {
-          console.error('Vendor fetch failed:', err)
-          setVendorStatus('error')
-        })
+      // If we already have a diagnosis, filter vendors by disease
+      const diseaseClass = diagnosis?.class_name || diagnosis?.disease || null
+      fetchVendors(diseaseClass)
     }
   }, [location])
 
@@ -51,13 +61,17 @@ export default function Dashboard() {
     }
   }
 
-  // Dashboard.jsx — replace handleDiagnosis
   function handleDiagnosis(data, meta = {}) {
     setDiagnosis(data)
 
+    // Re-fetch vendors filtered by the diagnosed disease
+    const diseaseClass = data?.class_name || data?.disease || null
+    if (diseaseClass && location) {
+      fetchVendors(diseaseClass)
+    }
+
     // Only switch to the Results tab automatically when diagnosis came from the
     // ImageUpload (camera / file) or when explicitly requested.
-    // For chat-origin diagnoses, keep user on the Chat tab (so reply appears inline).
     if (meta.from === 'image' || meta.autoOpen === true) {
       setActiveTab('results')
     }
@@ -151,9 +165,15 @@ export default function Dashboard() {
 
         {activeTab === 'vendors' && (
           <div className="dash-panel vendors-panel">
-            <h2 className="panel-title">📍 Nearby Vendors</h2>
+            <h2 className="panel-title">📍 {matchedDisease ? 'Recommended Vendors' : 'Nearby Vendors'}</h2>
+            {matchedDisease && (
+              <div className="disease-vendor-banner">
+                <span>🎯 Showing vendors with pesticides for <strong>{matchedDisease.replace(/___/g, ' – ').replace(/_/g, ' ')}</strong></span>
+                <button className="btn-show-all" onClick={() => fetchVendors(null)}>Show All</button>
+              </div>
+            )}
             <div className="vendors-layout">
-              <VendorList vendors={vendors} status={vendorStatus} />
+              <VendorList vendors={vendors} status={vendorStatus} matchedDisease={matchedDisease} />
               <MapView vendors={vendors} center={location} />
             </div>
           </div>

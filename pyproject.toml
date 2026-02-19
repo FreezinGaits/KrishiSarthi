@@ -33,4 +33,5 @@ dependencies = [
     "uvicorn[standard]>=0.30.6",
     "langchain-groq>=1.1.2",
     "google-cloud-translate>=3.24.0",
+    "deep-translator>=1.11.4",
 ]

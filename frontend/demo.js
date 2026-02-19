@@ -164,7 +164,6 @@
         const body = {
             message: text || "Please diagnose this crop image",
             session_id: sessionId,
-            language: "hi",
         };
         if (imageBase64) body.image_base64 = imageBase64;
         if (userLocation.lat) {

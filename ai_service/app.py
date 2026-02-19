@@ -19,6 +19,7 @@ from groq import Groq
 
 # import your inference function
 from .inference import predict_disease  # -> returns {"class_name":..., "confidence":...}
+from .translation import detect_language, translate_to_english, translate_from_english
 
 # --- Optional: RAG / LLM pieces (uses your notebook approach) ---
 # If you have a saved FAISS index and embeddings configured like in your notebook,
@@ -49,6 +50,72 @@ if os.path.exists(VENDOR_DATA_PATH):
             vendors_data = json.load(f)
     except Exception as e:
         print("Vendor data load error:", e)
+
+# ── Disease → Pesticide keyword mapping ──────────────────────
+# Extract pesticide keywords from disease metadata for vendor matching
+def build_disease_pesticide_map(metadata):
+    """Build a mapping from disease class -> list of pesticide keywords."""
+    mapping = {}
+    for disease_key, info in metadata.items():
+        keywords = []
+        # Extract from chemical_controls_examples
+        for ctrl in info.get("chemical_controls_examples", []):
+            # Extract known pesticide names from the text
+            for word in [
+                "mancozeb", "copper", "chlorothalonil", "propiconazole",
+                "hexaconazole", "tricyclazole", "carbendazim", "metalaxyl",
+                "imidacloprid", "fipronil", "chlorpyrifos", "pendimethalin",
+                "validamycin", "lambda cyhalothrin", "neem",
+                "strobilurin", "phosphonate", "phosphite",
+                "copper oxychloride", "copper bactericide",
+            ]:
+                if word in ctrl.lower():
+                    keywords.append(word)
+        mapping[disease_key] = list(set(keywords))
+    return mapping
+
+def match_vendors_for_disease(disease_key, vendors, lat=None, lng=None, radius_km=50):
+    """Find vendors that stock pesticides relevant to the diagnosed disease."""
+    keywords = disease_pesticide_map.get(disease_key, [])
+    if not keywords:
+        return []  # No known pesticide mapping for this disease
+
+    results = []
+    for v in vendors:
+        # Calculate distance if location provided
+        dist = None
+        if lat is not None and lng is not None:
+            dist = calculate_distance(lat, lng, v["lat"], v["lng"])
+            if dist > radius_km:
+                continue
+
+        # Check which pesticides this vendor has that match
+        vendor_products = [p.lower() for p in v.get("pesticides_available", [])]
+        matched_products = []
+        for kw in keywords:
+            for prod in vendor_products:
+                if kw in prod:
+                    # Return the original (non-lowered) product name
+                    orig_idx = vendor_products.index(prod)
+                    matched_products.append(v["pesticides_available"][orig_idx])
+
+        if matched_products:
+            results.append({
+                "name": v["name"],
+                "address": v["address"],
+                "city": v.get("city", ""),
+                "lat": v["lat"],
+                "lng": v["lng"],
+                "phone": v.get("phone"),
+                "rating": v.get("rating"),
+                "distance_km": round(dist, 1) if dist is not None else None,
+                "products": list(set(matched_products)),
+                "match_score": len(set(matched_products)),
+            })
+
+    # Sort by match_score (most relevant first), then distance
+    results.sort(key=lambda x: (-x["match_score"], x["distance_km"] or 0))
+    return results
 
 CLASS_LABELS_PATH = os.path.join(BASE_DIR, "class_labels.json")
 
@@ -81,6 +148,10 @@ if os.path.exists(DISEASE_META_PATH):
         disease_metadata = json.load(f)
 else:
     disease_metadata = {}
+
+# Build the disease-pesticide map after metadata is loaded
+disease_pesticide_map = build_disease_pesticide_map(disease_metadata)
+print(f"Disease-pesticide map built: {len(disease_pesticide_map)} diseases mapped")
 
 # Load class label mapping (optional, used for nicer names)
 if os.path.exists(CLASS_LABELS_PATH):
@@ -118,15 +189,19 @@ if RAG_AVAILABLE and os.path.isdir(FAISS_INDEX_DIR):
         # Use same prompt template you had in the notebook
         prompt_template = PromptTemplate(
             template="""
-        You are Krishi-Sarthi, an expert agricultural AI assistant.
+        You are Krishi-Sarthi, an expert agricultural AI assistant for Indian farmers.
 
         RULES:
 
         1. If image analysis is present in context, ALWAYS use it.
-        2. If user greets (hi, hello, namaste), respond politely in a farming tone.
+        2. If user greets (hi, hello, namaste, namaskar), respond politely in a farming tone.
         3. If user asks about the uploaded image, base your answer on IMAGE ANALYSIS RESULT first.
         4. If context insufficient, use agricultural knowledge.
         5. Never hallucinate unknown image sources.
+        6. ALWAYS respond in English. Translation to the user's language is handled separately.
+        7. Be concise and practical — farmers need actionable advice.
+        8. The user may be an Indian farmer asking in Hindi or Hinglish (Hindi written in English letters).
+           The question has been translated to English for you. Answer naturally in English.
 
         Response format when disease identified:
 
@@ -196,7 +271,14 @@ async def speech_to_text(audio: UploadFile = File(...)):
 
         os.unlink(tmp_path)
 
-        return {"transcript": transcription.text}
+        # Detect language of the transcribed text
+        transcript_text = transcription.text
+        detected_lang = detect_language(transcript_text)
+
+        return {
+            "transcript": transcript_text,
+            "detected_language": detected_lang
+        }
 
     except Exception as e:
         print("STT ERROR:", e)
@@ -241,7 +323,9 @@ async def chat(req: ChatRequest):
     Chat endpoint used by ChatInterface and sending images as base64.
     - If image_base64 present: save, run predict_disease and include diagnosis in reply.
     - If RAG available: retrieve context and call LLM (ChatGroq) to answer the message.
-    Response shape expected by frontend: { reply: str, diagnosis: {...}, vendors: [...] }
+    - Auto-detects input language (Hindi/Hinglish/English), translates to English for RAG,
+      then translates the response back to the user's language.
+    Response shape expected by frontend: { reply: str, diagnosis: {...}, vendors: [...], detected_language: str }
     """
     if not req.session_id:
         req.session_id = "default"
@@ -249,12 +333,23 @@ async def chat(req: ChatRequest):
     if req.session_id not in session_memory:
         session_memory[req.session_id] = []
 
+    # ── Language detection & translation ──
+    original_message = req.message
+    detected_lang = detect_language(req.message)
+    print(f"[LANG] Detected: {detected_lang} | Original: {req.message[:80]}")
+
+    # Translate to English for RAG and LLM processing
+    english_message = translate_to_english(req.message, detected_lang)
+    if detected_lang != "en":
+        print(f"[LANG] Translated to English: {english_message[:80]}")
+
     session_memory[req.session_id].append({
         "role": "user",
         "content": req.message
     })
     # ---- META QUESTION HANDLER ----
-    lower_msg = req.message.lower().strip()
+    # Use English version for processing
+    lower_msg = english_message.lower().strip()
 
     meta_triggers = [
         "previous question",
@@ -345,7 +440,8 @@ async def chat(req: ChatRequest):
                     context_blocks.append(image_context)
 
                 # 2️⃣ Retrieve knowledge context
-                retrieval_query = req.message
+                # Use English message for RAG retrieval
+                retrieval_query = english_message
                 if diagnosis:
                     retrieval_query += f" related to {diagnosis.get('class_name')}"
 
@@ -365,9 +461,10 @@ async def chat(req: ChatRequest):
                     for m in session_memory[req.session_id][-10:]
                 )
                 # 3️⃣ Build prompt
+                # Use English message in the prompt for best LLM quality
                 final_prompt = prompt_template.invoke({
                     "context": full_context + "\n\nConversation History:\n" + history_text,
-                    "question": req.message
+                    "question": english_message
                 })
 
                 llm_resp = llm.invoke(final_prompt)
@@ -408,18 +505,39 @@ async def chat(req: ChatRequest):
     if image_path_tmp and os.path.exists(image_path_tmp):
         os.unlink(image_path_tmp)
 
-    # vendors: simple empty list for now; your frontend expects vendors maybe from /find-vendors
+    # Auto-find disease-matched vendors if diagnosis available
     vendors = []
-    # Save assistant reply
+    if diagnosis and diagnosis.get("class_name"):
+        vendors = match_vendors_for_disease(
+            diagnosis["class_name"],
+            vendors_data,
+            lat=req.latitude,
+            lng=req.longitude,
+            radius_km=100  # wider radius for disease-matched vendors
+        )
+
+    # ── Translate response back to user's language ──
+    if detected_lang != "en" and reply_text:
+        translated_reply = translate_from_english(reply_text, detected_lang)
+        print(f"[LANG] Translated reply to {detected_lang}: {translated_reply[:80]}")
+    else:
+        translated_reply = reply_text
+
+    # Save assistant reply (store original English for context)
     session_memory[req.session_id].append({
         "role": "assistant",
-        "content": reply_text
+        "content": reply_text  # store English for better LLM context
     })
 
     # 🔥 Keep only last 20 messages (10 turns)
     if len(session_memory[req.session_id]) > 20:
         session_memory[req.session_id] = session_memory[req.session_id][-20:]
-    return {"reply": reply_text, "diagnosis": diagnosis, "vendors": vendors}
+    return {
+        "reply": translated_reply,
+        "diagnosis": diagnosis,
+        "vendors": vendors,
+        "detected_language": detected_lang
+    }
 from math import radians, cos, sin, sqrt, atan2
 
 def calculate_distance(lat1, lon1, lat2, lon2):
@@ -435,33 +553,38 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 async def find_vendors(data: dict):
     latitude = data.get("latitude")
     longitude = data.get("longitude")
-    radius_km = data.get("radius_km", 10)
+    radius_km = data.get("radius_km", 50)
+    disease = data.get("disease")  # optional disease class for filtering
 
     if latitude is None or longitude is None:
         return {"vendors": []}
 
-    results = []
+    # If disease is provided, return disease-matched vendors
+    if disease and disease in disease_pesticide_map:
+        results = match_vendors_for_disease(
+            disease, vendors_data,
+            lat=latitude, lng=longitude, radius_km=radius_km
+        )
+        return {"vendors": results, "matched_disease": disease}
 
+    # Otherwise return all nearby vendors
+    results = []
     for v in vendors_data:
         dist = calculate_distance(latitude, longitude, v["lat"], v["lng"])
         if dist <= radius_km:
             results.append({
                 "name": v["name"],
                 "address": v["address"],
+                "city": v.get("city", ""),
                 "lat": v["lat"],
                 "lng": v["lng"],
                 "phone": v.get("phone"),
                 "rating": v.get("rating"),
-                "distance_km": dist,
+                "distance_km": round(dist, 1),
                 "products": v.get("pesticides_available", [])[:5]
             })
-    print("Vendor file path:", VENDOR_DATA_PATH)
-    print("Vendor file exists:", os.path.exists(VENDOR_DATA_PATH))
-    print("Vendors loaded:", len(vendors_data))
-    print("Vendors loaded:", vendors_data)
 
     results.sort(key=lambda x: x["distance_km"])
-    
     return {"vendors": results}
 
 # small convenience to run locally
