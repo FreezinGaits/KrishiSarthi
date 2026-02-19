@@ -16,6 +16,10 @@ from pydantic import Field
 
 class Settings(BaseSettings):
     """Application settings loaded from .env file."""
+    # Chroma / RAG
+    chroma_persist_dir: str = str(Path(__file__).parent.parent.parent / "ai-service/models/chroma_db")
+    use_openai_embeddings_for_rag: bool = False  # set true to use OpenAI embeddings in build/runtime
+    local_embedding_model: str = "BAAI/bge-small-en-v1.5"  # sentence-transformers model for local embeddings
 
     # ── Core ──────────────────────────────────────────────
     app_name: str = "Krishi-Sarthi"
@@ -43,6 +47,10 @@ class Settings(BaseSettings):
     grok_api_key: str = ""
     grok_base_url: str = "https://api.x.ai/v1"
     grok_model: str = "grok-2-latest"
+
+    # ── Groq (LPU) ────────────────────────────────────────
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.1-8b-instant"
 
     # ── Google Maps ───────────────────────────────────────
     google_maps_api_key: str = ""

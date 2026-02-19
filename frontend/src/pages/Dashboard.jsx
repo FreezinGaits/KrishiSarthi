@@ -43,10 +43,18 @@ export default function Dashboard() {
     }
   }
 
-  function handleDiagnosis(data) {
+  // Dashboard.jsx — replace handleDiagnosis
+  function handleDiagnosis(data, meta = {}) {
     setDiagnosis(data)
-    setActiveTab('results')
+
+    // Only switch to the Results tab automatically when diagnosis came from the
+    // ImageUpload (camera / file) or when explicitly requested.
+    // For chat-origin diagnoses, keep user on the Chat tab (so reply appears inline).
+    if (meta.from === 'image' || meta.autoOpen === true) {
+      setActiveTab('results')
+    }
   }
+
 
   return (
     <div className="dashboard">
@@ -73,9 +81,23 @@ export default function Dashboard() {
               <span className="tab-icon">{tab.icon}</span>
               <span className="tab-label">{tab.label}</span>
             </button>
-          ))}
+
+          ))
+}
         </div>
       </nav>
+      <button className="dash-reset-btn" onClick={() => {
+        // call child reset via ref
+        if (chatRef.current?.sendMessage) {
+          // trigger ChatInterface to reset by calling a new exposed method if you added one;
+          // simpler: clear localStorage and reload page:
+          localStorage.removeItem('chat_history');
+          localStorage.removeItem('chat_session_id');
+          window.location.reload();
+        }
+      }}>
+        New Chat
+      </button>
 
       <main className="dash-main">
         {activeTab === 'chat' && (

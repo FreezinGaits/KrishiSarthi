@@ -37,7 +37,9 @@ class Base(DeclarativeBase):
     pass
 
 
-async def get_db() -> AsyncSession:
+from typing import AsyncGenerator
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """FastAPI dependency — yields an async database session."""
     async with async_session_factory() as session:
         try:

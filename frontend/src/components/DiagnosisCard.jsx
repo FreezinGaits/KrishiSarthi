@@ -3,11 +3,25 @@ import './DiagnosisCard.css'
 export default function DiagnosisCard({ data, compact = false }) {
   if (!data) return null
 
-  const disease = data.top_disease || data.disease || 'Unknown'
+  const disease = data.top_disease || data.disease || ''
+
+  // Hide card completely if disease invalid
+  if (!disease || disease === 'Unknown') {
+    return null
+  }
   const confidence = data.top_confidence || data.confidence || 0
   const confPercent = Math.round(confidence * 100)
-  const treatment = data.treatment || ''
-  const pesticide = data.pesticide || ''
+  
+  // 🔥 Read metadata correctly
+  const meta = data.metadata || {}
+  
+  const summary = meta.summary || ''
+  const symptoms = meta.symptoms || ''
+  const causes = meta.causes || ''
+  const treatment = meta.treatment || ''
+  const pesticide = meta.pesticide || ''
+  const prevention = meta.prevention || ''
+  
   const severity = confPercent >= 80 ? 'high' : confPercent >= 50 ? 'medium' : 'low'
 
   if (compact) {
@@ -24,9 +38,14 @@ export default function DiagnosisCard({ data, compact = false }) {
     <div className="diag-card" data-severity={severity}>
       <div className="diag-header">
         <div className="diag-disease">
-          <h3>🔬 {disease}</h3>
-          <span className="diag-scientific">{data.scientific_name || ''}</span>
+          <h3>🔬 {meta.common_name || disease.replace(/___/g, ' ')}</h3>
+          {meta.scientific_name && (
+            <span className="diag-scientific">
+              {meta.scientific_name}
+            </span>
+          )}
         </div>
+  
         <div className="confidence-ring" data-severity={severity}>
           <svg viewBox="0 0 36 36" className="ring-svg">
             <path
@@ -42,25 +61,66 @@ export default function DiagnosisCard({ data, compact = false }) {
           <span className="ring-text">{confPercent}%</span>
         </div>
       </div>
-
-      {treatment && (
+  
+      {meta.pathogen_type && (
         <div className="diag-section">
-          <h4>💊 Treatment</h4>
-          <p>{treatment}</p>
+          <h4>🦠 Pathogen Type</h4>
+          <p>{meta.pathogen_type}</p>
         </div>
       )}
-
-      {pesticide && (
+  
+      {meta.key_symptoms && (
         <div className="diag-section">
-          <h4>🧴 Recommended Pesticide</h4>
-          <p>{pesticide}</p>
+          <h4>🌿 Key Symptoms</h4>
+          <ul>
+            {meta.key_symptoms.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ul>
         </div>
       )}
-
-      {data.prevention && (
+  
+      {meta.transmission && (
+        <div className="diag-section">
+          <h4>🔁 Transmission</h4>
+          <ul>
+            {meta.transmission.map((t, i) => (
+              <li key={i}>{t}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+  
+      {meta.cultural_controls && (
+        <div className="diag-section">
+          <h4>🌾 Cultural Controls</h4>
+          <ul>
+            {meta.cultural_controls.map((c, i) => (
+              <li key={i}>{c}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+  
+      {meta.chemical_controls_examples && (
+        <div className="diag-section">
+          <h4>💊 Chemical Controls</h4>
+          <ul>
+            {meta.chemical_controls_examples.map((c, i) => (
+              <li key={i}>{c}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+  
+      {meta.prevention && (
         <div className="diag-section">
           <h4>🛡️ Prevention</h4>
-          <p>{data.prevention}</p>
+          <ul>
+            {meta.prevention.map((p, i) => (
+              <li key={i}>{p}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

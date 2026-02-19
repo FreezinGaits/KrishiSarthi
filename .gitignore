@@ -1,12 +1,13 @@
 # ═══════════════════════════════════════════════════
-# Krishi-Sarthi .gitignore
+# KrishiSarthi .gitignore
 # ═══════════════════════════════════════════════════
 
 # ── Environment & Secrets ─────────────────────────
 .env
-.env.local
-.env.production
+.env.*
+!.env.demo
 backend/.env
+cred.txt
 
 # ── Python ────────────────────────────────────────
 __pycache__/
@@ -21,21 +22,24 @@ __pycache__/
 dist/
 build/
 .Python
+.python-version
 
 # ── Virtual Environments ──────────────────────────
 .venv/
 venv/
 env/
-backend/.venv/
+
+# ── UV (Python package manager) ───────────────────
+uv.lock
 
 # ── Node.js / Frontend ───────────────────────────
 node_modules/
-frontend/node_modules/
 frontend/dist/
 frontend/.cache/
 .npm
 .yarn/
 *.tsbuildinfo
+package-lock.json
 
 # ── IDE / Editor ──────────────────────────────────
 .vscode/
@@ -46,26 +50,53 @@ frontend/.cache/
 .DS_Store
 Thumbs.db
 desktop.ini
+ehthumbs.db
 
 # ── Database Files ────────────────────────────────
 *.db
 *.sqlite3
 *.sqlite3-journal
-demo.db
-krishi.db
-krishi_demo.db
 
-# ── AI Models (too large for git) ─────────────────
-ai-service/models/*.pth
-ai-service/models/*.pt
-ai-service/models/*.bin
-ai-service/models/*.onnx
-ai-service/models/faiss_index/
+# ── AI Models & Weights (too large for git) ───────
+ai_service/models/*.pth
+ai_service/models/*.pt
+ai_service/models/*.bin
+ai_service/models/*.onnx
+ai_service/models/huggingface_cache/
+ai_service/models/chroma_db/
+
+# ── FAISS Index ───────────────────────────────────
+faiss_index/
+ai_service/faiss_index/
+
+# ── Datasets & Training Data (too large) ──────────
+ai_service/data/raw/
+ai_service/data/rag/
 
 # ── Uploads & Generated ──────────────────────────
 uploads/
 backend/uploads/
 *.log
+backend/backend_logs.txt
+backend/backend_errors.txt
+classifier_output.txt
+response.json
+
+# ── Backup folder ────────────────────────────────
+backup/
+
+# ── Test / Scratch files ─────────────────────────
+test.jpg
+test.JPG
+test2.JPG
+test_leaf.jpg
+test.json
+test_onion.json
+i.txt
+i2.txt
+
+# ── Jupyter Notebooks (optional, large outputs) ──
+*.ipynb
 
 # ── Testing / Coverage ───────────────────────────
 htmlcov/
@@ -76,24 +107,27 @@ htmlcov/
 .nox/
 coverage.xml
 
-# ── Type Checkers ─────────────────────────────────
+# ── Type Checkers & Linters ───────────────────────
 .mypy_cache/
 .pytype/
 .pyre/
 .ruff_cache/
-
-# ── OS Files ──────────────────────────────────────
-.DS_Store
-Thumbs.db
-ehthumbs.db
-Desktop.ini
 
 # ── Misc ──────────────────────────────────────────
 *.bak
 *.tmp
 *.temp
 .cache/
-
-# Raw datasets (too large for git)
-ai-service/data/raw/
-demo_assets/sample_images/
+demo_assets/
+/downloadi.py
+/run_demo.py
+/classifier_output.txt
+/backend/
+/ai_service/models/
+/ai_service/data/
+/ai_service/build_chroma.py
+/ai_service/build_faiss.py
+/ai_service/build_rag_docs.py
+/ai_service/find_vendors.py
+/demo_assets/
+/n8n/

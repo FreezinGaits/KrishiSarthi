@@ -366,7 +366,7 @@ def _load_model():
 
     model_path = Path(settings.classifier_model_path)
     print(f"DEBUG: Attempting to load model from: {model_path}", flush=True)
-    
+
     if not model_path.exists():
         print(f"DEBUG: Model file not found at {model_path}", flush=True)
         return None
@@ -378,7 +378,7 @@ def _load_model():
         print(f"DEBUG: Torch imported. CUDA: {torch.cuda.is_available()}", flush=True)
 
         _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        
+
         # Determine correct number of classes from labels file
         labels = _load_class_labels()
         if labels:
@@ -388,16 +388,44 @@ def _load_model():
             num_classes = len(DISEASE_DATABASE)
             print(f"DEBUG: Using {num_classes} classes from database keys (fallback)", flush=True)
 
-        # Re-create architecture
-        model = models.efficientnet_b0(weights=None)
-        model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, num_classes)
-        
-        # Load weights
-        state_dict = torch.load(str(model_path), map_location=_device, weights_only=True)
+        # Re-create EfficientNet-B0 architecture (torchvision)
+        try:
+            model = models.efficientnet_b0(weights=None)
+        except Exception:
+            # older/newer torchvision compatibility fallback
+            model = models.efficientnet_b0(pretrained=False)
+
+        # Replace classifier head to match number of classes
+        in_features = None
+        if hasattr(model, "classifier") and isinstance(model.classifier, (list, tuple)) is False:
+            # torchvision efficientnet classifier is Sequential(Dropout, Linear)
+            try:
+                in_features = model.classifier[1].in_features
+                model.classifier[1] = torch.nn.Linear(in_features, num_classes)
+            except Exception:
+                # fallback for differing torchvision versions
+                # try to find last linear layer
+                for name, module in model.named_modules():
+                    if isinstance(module, torch.nn.Linear):
+                        in_features = module.in_features
+                if in_features is None:
+                    raise RuntimeError("Couldn't find classifier Linear layer in EfficientNet model")
+                # replace the final linear (best-effort)
+                model.classifier = torch.nn.Sequential(torch.nn.Dropout(p=0.2), torch.nn.Linear(in_features, num_classes))
+        else:
+            # very defensive fallback
+            model.classifier = torch.nn.Sequential(torch.nn.Dropout(p=0.2), torch.nn.Linear(model.classifier.in_features, num_classes))
+
+        # Load weights (state_dict saved by train script)
+        state_dict = torch.load(str(model_path), map_location=_device)
+        # If the state_dict was saved under 'model' key, handle that:
+        if isinstance(state_dict, dict) and "state_dict" in state_dict and isinstance(state_dict["state_dict"], dict):
+            state_dict = state_dict["state_dict"]
+
         model.load_state_dict(state_dict)
         model.to(_device)
         model.eval()
-        
+
         _transforms = T.Compose([
             T.Resize(256),
             T.CenterCrop(224),
@@ -409,7 +437,9 @@ def _load_model():
         return _model
     except Exception as e:
         print(f"DEBUG: Failed to load classifier model: {e}", flush=True)
+        logger.exception("Failed to load classifier model")
         return None
+
 
 
 def _build_prediction(class_key: str, confidence: float) -> DiagnosisPrediction:

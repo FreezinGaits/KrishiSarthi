@@ -1,4 +1,15 @@
 /* ═══  Chat Interface  ═══ */
+.chat-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 12px;
+  border-bottom:1px solid rgba(0,0,0,0.06);
+  gap:8px;
+}
+.chat-controls-left .btn-reset { background:#fff; border:1px solid #ddd; padding:6px 8px; border-radius:6px; cursor:pointer;}
+.answer-length { margin-right:12px; font-size:14px; }
+.chat-upload { background:transparent; border:none; font-size:20px; margin-right:6px; cursor:pointer; }
 
 .chat-container {
   display: flex;
@@ -47,6 +58,9 @@
 }
 .chat-msg.assistant .msg-bubble {
   background: var(--bg-glass);
+  -webkit-backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-bottom-left-radius: 4px;

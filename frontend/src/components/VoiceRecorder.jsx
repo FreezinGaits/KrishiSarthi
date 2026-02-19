@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
-import { speechToText } from '../services/api'
+import { speechToText, chatWithAgent } from '../services/api'
 import './VoiceRecorder.css'
+// import { speechToText, chatWithAgent } from '../services/api'
 
 export default function VoiceRecorder({ onTranscript }) {
   const [recording, setRecording] = useState(false)
@@ -10,46 +11,118 @@ export default function VoiceRecorder({ onTranscript }) {
   const mediaRef = useRef(null)
   const chunksRef = useRef([])
 
+  const recognitionRef = useRef(null)
+  const transcriptRef = useRef('')
+
   async function startRecording() {
     setError('')
     setTranscript('')
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
-      mediaRef.current = recorder
-      chunksRef.current = []
+    transcriptRef.current = ''
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data)
-      }
-
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop())
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
-        await processAudio(blob)
-      }
-
-      recorder.start()
-      setRecording(true)
-    } catch (e) {
-      setError('Microphone access denied. कृपया माइक्रोफ़ोन की अनुमति दें।')
+    if (!('webkitSpeechRecognition' in window)) {
+      setError('Speech recognition not supported in this browser.')
+      return
     }
+
+    const recognition = new window.webkitSpeechRecognition()
+    recognitionRef.current = recognition
+
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = 'en-IN'
+
+    recognition.onstart = () => {
+      setRecording(true)
+    }
+
+    recognition.onresult = (event) => {
+      let finalTranscript = ''
+      let interimTranscript = ''
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const chunk = event.results[i][0].transcript
+        if (event.results[i].isFinal) {
+          finalTranscript += chunk
+        } else {
+          interimTranscript += chunk
+        }
+      }
+
+      const fullText = finalTranscript + interimTranscript
+      transcriptRef.current = fullText
+      setTranscript(fullText)
+    }
+
+    recognition.onerror = (e) => {
+      console.error(e)
+      setError('Speech recognition error.')
+    }
+
+    recognition.onend = async () => {
+      setRecording(false)
+
+      const finalText = transcriptRef.current.trim()
+      if (!finalText) return
+
+      setProcessing(true)
+
+      try {
+        const res = await chatWithAgent(
+          finalText,
+          `voice-${Date.now()}`,
+          null,
+          null,
+          null,
+          'hi',
+          {}
+        )
+
+        setTranscript(prev => prev + "\n\n🤖 " + (res.reply || 'No reply received.'))
+      } catch (err) {
+        console.error(err)
+        setError('AI response failed.')
+      } finally {
+        setProcessing(false)
+      }
+    }
+
+    recognition.start()
   }
 
   function stopRecording() {
-    mediaRef.current?.stop()
-    setRecording(false)
+    recognitionRef.current?.stop()
   }
 
   async function processAudio(blob) {
     setProcessing(true)
+  
     try {
-      const res = await speechToText(blob)
-      const text = res.transcript || res.text || ''
-      setTranscript(text)
-      if (text && onTranscript) onTranscript(text)
-    } catch {
-      setError('Speech recognition failed. कृपया दोबारा कोशिश करें।')
+      // 1️⃣ Convert speech to text
+      const sttRes = await speechToText(blob)
+      const text = sttRes.transcript || sttRes.text || ''
+  
+      if (!text) {
+        setError('Could not detect speech.')
+        return
+      }
+  
+      // 2️⃣ Immediately send to AI chat
+      const chatRes = await chatWithAgent(
+        text,
+        `voice-${Date.now()}`,   // simple session
+        null,
+        null,
+        null,
+        'hi',
+        {}
+      )
+  
+      // 3️⃣ Show both transcript + AI reply
+      setTranscript(text + "\n\n🤖 " + (chatRes.reply || 'No reply received.'))
+  
+    } catch (err) {
+      console.error("VOICE ERROR:", err)
+      setError('Voice processing failed. Please try again.')
     } finally {
       setProcessing(false)
     }

@@ -1,0 +1,446 @@
+{
+  "Pepper___Bacterial_spot": {
+    "common_name": "Bacterial spot (pepper)",
+    "scientific_name": "Xanthomonas spp. (e.g., Xanthomonas euvesicatoria / X. vesicatoria)",
+    "pathogen_type": "bacterium",
+    "primary_hosts": ["Capsicum spp. (bell pepper, hot pepper)"],
+    "key_symptoms": [
+      "Small, water-soaked irregular spots on leaves that may become angular",
+      "Lesions on fruit (scabby, raised, dark lesions)",
+      "Leaf yellowing and premature defoliation under severe infection"
+    ],
+    "diagnostic_clues": [
+      "Water-soaked lesions in humid conditions",
+      "Brown/black lesions on fruit with greasy appearance",
+      "Often worse when overhead irrigation is used"
+    ],
+    "transmission": [
+      "Spread by splashing water (rain, overhead irrigation)",
+      "Contaminated seed or transplants",
+      "Spread on tools, hands, equipment"
+    ],
+    "cultural_controls": [
+      "Use pathogen-free seed and transplants",
+      "Avoid overhead irrigation; use drip irrigation to reduce splash",
+      "Remove and destroy infected plant debris; rotate crops",
+      "Sanitize tools and hands"
+    ],
+    "biological_controls": [
+      "Biocontrols are limited; focus on cultural + tolerant varieties where available"
+    ],
+    "chemical_controls_examples": [
+      "Copper-based bactericides (commonly used protectant)",
+      "Use in integrated program; effectiveness can decline due to resistance"
+    ],
+    "prevention": [
+      "Use certified disease-free seed/transplants",
+      "Implement sanitation and cover/spacing to reduce humidity",
+      "Choose resistant/tolerant varieties if available"
+    ],
+    "notes": "Bacterial diseases often respond best to prevention and sanitation; chemical control is supplementary.",
+    "recommended_references": [
+      "PlantVillage / Penn State PlantPathology",
+      "University extension pages (state extension services)"
+    ]
+  },
+
+  "Pepper___healthy": {
+    "common_name": "Healthy pepper",
+    "scientific_name": null,
+    "pathogen_type": "healthy",
+    "primary_hosts": ["Capsicum spp."],
+    "key_symptoms": ["No disease symptoms; leaves, stems, and fruit appear normal"],
+    "diagnostic_clues": ["Absence of lesions, chlorosis, necrosis or vector presence"],
+    "management": ["Standard good agronomic practices; monitor regularly for pests/diseases"],
+    "notes": "Keep good records and collect labelled examples of any new symptoms for diagnosis."
+  },
+
+  "Potato___Early_blight": {
+    "common_name": "Early blight (potato)",
+    "scientific_name": "Alternaria solani",
+    "pathogen_type": "fungus",
+    "primary_hosts": ["Solanum tuberosum (potato)", "Tomato (also susceptible)"],
+    "key_symptoms": [
+      "Dark, concentric-ring lesions (target-like) on older leaves",
+      "Lower leaves affected first, may cause defoliation",
+      "Lesions on stems and tuber skin in severe cases"
+    ],
+    "diagnostic_clues": [
+      "Concentric rings within lesions (classic 'target' spot)",
+      "Symptoms typically start on older foliage during warm, wet weather"
+    ],
+    "transmission": [
+      "Overwinters in crop debris, cull piles",
+      "Spores dispersed by wind and splashing water"
+    ],
+    "cultural_controls": [
+      "Crop rotation and burying/destroying infected debris",
+      "Use certified seed potatoes",
+      "Avoid excessive nitrogen which increases lush growth"
+    ],
+    "biological_controls": ["Experimental; common strategy is IPM combining cultural and chemical"],
+    "chemical_controls_examples": [
+      "Protectant fungicides (e.g., chlorothalonil)",
+      "Some systemic fungicides (strobilurins, DMIs) are used in rotation"
+    ],
+    "prevention": [
+      "Use resistant/tolerant varieties if available",
+      "Good field sanitation and rotation"
+    ],
+    "recommended_references": [
+      "MSU Extension (Potato Diseases: Early Blight)",
+      "Plant pathology extension sources"
+    ]
+  },
+
+  "Potato___Late_blight": {
+    "common_name": "Late blight (potato)",
+    "scientific_name": "Phytophthora infestans",
+    "pathogen_type": "oomycete (water mold)",
+    "primary_hosts": ["Potato (Solanum tuberosum)", "Tomato (Solanum lycopersicum)"],
+    "key_symptoms": [
+      "Water-soaked, dark lesions on leaves that expand rapidly",
+      "White fuzzy sporulation on leaf underside in humid conditions",
+      "Rapid collapse of foliage; infected tubers show brownish rot under skin"
+    ],
+    "diagnostic_clues": [
+      "Very rapid disease spread in cool, wet conditions",
+      "White fuzzy sporulation at lesion margins under high humidity"
+    ],
+    "transmission": [
+      "Windborne sporangia and rain splashes",
+      "Can be spread by infected seed tubers"
+    ],
+    "cultural_controls": [
+      "Use certified seed tubers; remove infected plants and cull tubers",
+      "Improve airflow, avoid overhead irrigation",
+      "Crop rotation and avoid planting near volunteer potatoes"
+    ],
+    "biological_controls": [
+      "Limited; focus on resistant varieties and chemical programs"
+    ],
+    "chemical_controls_examples": [
+      "Oomycete-active fungicides (phenylamides like metalaxyl/mefenoxam historically; phosphonates/phosphites; other oomycete-specific actives)",
+      "Use recommended local fungicide programs and rotate modes of action"
+    ],
+    "prevention": [
+      "Use resistant varieties where available; strict seed certification",
+      "Rapid detection & removal to limit outbreaks"
+    ],
+    "recommended_references": [
+      "NC State Extension (Potato Late Blight)",
+      "FAO / plant pathology extension resources"
+    ]
+  },
+
+  "Potato___healthy": {
+    "common_name": "Healthy potato",
+    "scientific_name": null,
+    "pathogen_type": "healthy",
+    "primary_hosts": ["Solanum tuberosum"],
+    "key_symptoms": ["No disease lesions or discoloration on foliage or tubers"],
+    "management": ["Maintain good seed, rotation, irrigation, and soil health practices"]
+  },
+
+  "Tomato___Bacterial_spot": {
+    "common_name": "Bacterial spot (tomato)",
+    "scientific_name": "Xanthomonas spp. (e.g., X. euvesicatoria / X. vesicatoria)",
+    "pathogen_type": "bacterium",
+    "primary_hosts": ["Tomato (Solanum lycopersicum)"],
+    "key_symptoms": [
+      "Small, water-soaked, scabby or angular spots on leaves",
+      "Lesions on fruit (dark, raised, scabby)",
+      "Defoliation and reduced yield under severe pressure"
+    ],
+    "diagnostic_clues": [
+      "Water-soaked appearance initially; greasy lesions on fruit",
+      "Often associated with warm, wet weather and overhead irrigation"
+    ],
+    "transmission": [
+      "Rain splash and irrigation",
+      "Contaminated seed, transplants, tools"
+    ],
+    "cultural_controls": [
+      "Use disease-free seed and transplants",
+      "Avoid overhead irrigation; remove infected debris",
+      "Sanitize tools and limit plant-to-plant contact"
+    ],
+    "chemical_controls_examples": [
+      "Copper bactericides (protectant)",
+      "Integrated program to reduce resistance risk"
+    ],
+    "prevention": [
+      "Certified clean seed; resistant/tolerant varieties if available",
+      "Reduce leaf wetness duration"
+    ],
+    "recommended_references": [
+      "PlantVillage / university extensions"
+    ]
+  },
+
+  "Tomato___Early_blight": {
+    "common_name": "Early blight (tomato)",
+    "scientific_name": "Alternaria solani",
+    "pathogen_type": "fungus",
+    "primary_hosts": ["Tomato", "Potato (also host)"],
+    "key_symptoms": [
+      "Dark lesions with concentric rings on lower older leaves (target spot)",
+      "Defoliation starting from the bottom upward",
+      "Lesions may appear on stems and fruit in heavy infections"
+    ],
+    "diagnostic_clues": [
+      "Classic concentric ring pattern inside lesions",
+      "Worse in warm, humid conditions and where crop debris persists"
+    ],
+    "transmission": [
+      "Spores survive in crop residue; spread by wind and splash"
+    ],
+    "cultural_controls": [
+      "Rotate crops and remove/bury crop debris",
+      "Avoid excess nitrogen; use proper spacing for airflow"
+    ],
+    "chemical_controls_examples": [
+      "Protectant fungicides (chlorothalonil) and systemic fungicides in rotation"
+    ],
+    "prevention": [
+      "Resistant varieties when available; sanitation and rotation"
+    ],
+    "recommended_references": [
+      "Plant pathology extension sources"
+    ]
+  },
+
+  "Tomato___Late_blight": {
+    "common_name": "Late blight (tomato)",
+    "scientific_name": "Phytophthora infestans",
+    "pathogen_type": "oomycete (water mold)",
+    "primary_hosts": ["Tomato", "Potato"],
+    "key_symptoms": [
+      "Water-soaked, dark lesions on leaves and stems; rapid collapse",
+      "White-gray sporulation present on lesion margins in humid conditions",
+      "Fruit may show firm, greasy lesions; rapid spread under cool-wet weather"
+    ],
+    "diagnostic_clues": [
+      "Rapid progression, white sporulation on underside in humid weather",
+      "Associated with cool, wet conditions and windblown spores"
+    ],
+    "transmission": [
+      "Windborne sporangia; infected seed or volunteer plants"
+    ],
+    "cultural_controls": [
+      "Use certified seed, remove infected plants, improve airflow",
+      "Avoid planting near infected fields or volunteer potatoes"
+    ],
+    "chemical_controls_examples": [
+      "Oomycete-targeting fungicides (e.g., mefenoxam/metalaxyl historically; phosphonates/phosphites; other recommended actives) used per local guidance"
+    ],
+    "prevention": [
+      "Rapid detection and removal, resistant varieties where available"
+    ],
+    "recommended_references": [
+      "PlantVillage, university extension pages (NC State, etc.)"
+    ]
+  },
+
+  "Tomato___Leaf_Mold": {
+    "common_name": "Tomato leaf mold",
+    "scientific_name": "Fulvia fulva (syn. Cladosporium fulvum)",
+    "pathogen_type": "fungus",
+    "primary_hosts": ["Tomato (Solanum lycopersicum)"],
+    "key_symptoms": [
+      "Olive-green to brown velvety spots on underside of leaves",
+      "Yellowing of upper leaf surface opposite the moldy underside spots",
+      "Defoliation in severe cases"
+    ],
+    "diagnostic_clues": [
+      "Velvety olive to brown sporulation on the underside of leaves",
+      "Symptoms worse in warm, humid greenhouse conditions"
+    ],
+    "transmission": [
+      "Conidia spread via air, water, or contaminated transplants"
+    ],
+    "cultural_controls": [
+      "Improve ventilation and spacing; avoid overhead watering",
+      "Remove infected leaves and debris; use resistant varieties if available"
+    ],
+    "chemical_controls_examples": [
+      "Fungicide protectants and appropriate systemic fungicides as recommended locally"
+    ],
+    "prevention": [
+      "Sanitation and good greenhouse/housing practices; choose clean transplants"
+    ],
+    "recommended_references": [
+      "Plant pathology extension resources"
+    ]
+  },
+
+  "Tomato___Mosaic_Virus": {
+    "common_name": "Tomato mosaic / mosaic viruses",
+    "scientific_name": "Mosaic viruses (e.g., Tobacco mosaic virus (TMV), Tomato mosaic virus (ToMV))",
+    "pathogen_type": "virus",
+    "primary_hosts": ["Tomato, many solanaceous species and other hosts (virus-dependent)"],
+    "key_symptoms": [
+      "Mottled light-and-dark green mosaic pattern on leaves",
+      "Leaf distortion, stunting, smaller fruit",
+      "Symptoms depend on virus strain and host"
+    ],
+    "diagnostic_clues": [
+      "Characteristic mosaic pattern; often uneven growth",
+      "Viruses often persist in seed, contaminated tools, and on hands"
+    ],
+    "transmission": [
+      "Mechanically via sap on hands, tools, handling; some viruses seed-borne or vectored by insects depending on virus"
+    ],
+    "cultural_controls": [
+      "Use virus-free seed and transplants; sanitation of tools and hands",
+      "Remove infected plants promptly to reduce spread"
+    ],
+    "biological_controls": [
+      "No chemical cures for plant viruses; focus on prevention and vector control"
+    ],
+    "prevention": [
+      "Certified clean seed, resistant varieties (if available), strict sanitation"
+    ],
+    "recommended_references": [
+      "PlantVillage; university extension diagnostics"
+    ]
+  },
+
+  "Tomato___Septoria_leaf_spot": {
+    "common_name": "Septoria leaf spot (tomato)",
+    "scientific_name": "Septoria lycopersici",
+    "pathogen_type": "fungus",
+    "primary_hosts": ["Tomato"],
+    "key_symptoms": [
+      "Many small, circular lesions with dark borders and pale centers on lower leaves",
+      "Heavy defoliation of lower canopy under wet conditions",
+      "Typically begins on older leaves"
+    ],
+    "diagnostic_clues": [
+      "Small roughly circular spots often with tiny black fruiting bodies visible with magnification",
+      "Worse in humid, wet weather"
+    ],
+    "transmission": [
+      "Fungal spores splash-dispersed from infected debris; survives in residue"
+    ],
+    "cultural_controls": [
+      "Remove crop residue, rotate crops, increase spacing for airflow",
+      "Avoid overhead irrigation; mulch soil to reduce splash"
+    ],
+    "chemical_controls_examples": [
+      "Protectant fungicides (chlorothalonil, mancozeb) and appropriate systemic actives rotated to prevent resistance"
+    ],
+    "prevention": [
+      "Sanitation and reducing leaf wetness; resistant varieties where available"
+    ],
+    "recommended_references": [
+      "Plant pathology extension pages"
+    ]
+  },
+
+  "Tomato___Spider_mites": {
+    "common_name": "Two-spotted spider mite (spider mites)",
+    "scientific_name": "Tetranychus urticae (two-spotted spider mite)",
+    "pathogen_type": "arthropod pest (mite)",
+    "primary_hosts": ["Tomato and many other crops"],
+    "key_symptoms": [
+      "Fine stippling/speckling on leaves (chlorotic points)",
+      "Webbing on heavily infested plants; bronzing of foliage",
+      "Reduced vigor and yield if heavy infestation"
+    ],
+    "diagnostic_clues": [
+      "Tiny mites visible with hand lens and fine webbing in advanced infestations",
+      "Symptoms often worse in hot, dry conditions"
+    ],
+    "transmission": [
+      "Mites move by crawling or carried on wind, equipment, transplants"
+    ],
+    "cultural_controls": [
+      "Maintain adequate irrigation (reduces stress that favors mites), encourage natural predators (predatory mites, ladybugs)",
+      "Avoid unnecessary broad-spectrum insecticides that kill beneficial predators"
+    ],
+    "chemical_controls_examples": [
+      "Miticides (use selective products and follow resistance management guidance)"
+    ],
+    "prevention": [
+      "Monitor with sticky cards and plant inspections; encourage biological controls"
+    ],
+    "recommended_references": [
+      "Integrated pest management extension pages"
+    ]
+  },
+
+  "Tomato___Target_Spot": {
+    "common_name": "Target spot (tomato)",
+    "scientific_name": "Corynespora cassiicola (commonly implicated)",
+    "pathogen_type": "fungus (or fungal-like)",
+    "primary_hosts": ["Tomato and many other plants (some strains are host-specific)"],
+    "key_symptoms": [
+      "Circular to irregular lesions with concentric rings (target-like) on leaves",
+      "Leaf blighting under favorable conditions"
+    ],
+    "diagnostic_clues": [
+      "Target-like concentric lesion patterns; check host and local disease reports"
+    ],
+    "transmission": [
+      "Windborne spores and splash; survives in crop residues"
+    ],
+    "cultural_controls": [
+      "Crop sanitation and residue removal; rotate hosts",
+      "Avoid overhead irrigation and reduce leaf wetness"
+    ],
+    "chemical_controls_examples": [
+      "Fungicide protectants and appropriate systemic fungicides where recommended"
+    ],
+    "prevention": [
+      "Sanitation; use clean transplants"
+    ],
+    "recommended_references": [
+      "Plant pathology and university extension resources"
+    ]
+  },
+
+  "Tomato___YellowLeaf_Curl_Virus": {
+    "common_name": "Tomato yellow leaf curl virus (TYLCV)",
+    "scientific_name": "Tomato yellow leaf curl virus (TYLCV) — a begomovirus",
+    "pathogen_type": "virus",
+    "primary_hosts": ["Tomato and some solanaceous species"],
+    "key_symptoms": [
+      "Severe leaf yellowing and upward curling of new leaves",
+      "Stunted plants and reduced yield; small, distorted fruit"
+    ],
+    "diagnostic_clues": [
+      "Rapid onset of curling and yellowing on new growth; presence of whiteflies on plant",
+      "Often severe in regions where whitefly vectors are abundant"
+    ],
+    "transmission": [
+      "Transmitted by the whitefly (Bemisia tabaci) in a persistent manner",
+      "Can be introduced on infected seedlings"
+    ],
+    "cultural_controls": [
+      "Control whitefly populations (screens, insect-proof greenhouses, reflective mulches), remove infected plants",
+      "Use virus-free seedlings and resistant varieties when available"
+    ],
+    "biological_controls": [
+      "Conservation of natural enemies of whiteflies can help reduce vector pressure"
+    ],
+    "chemical_controls_examples": [
+      "Insecticidal control of whiteflies (use IPM principles; rotate modes of action to limit resistance)"
+    ],
+    "prevention": [
+      "Use resistant varieties where available; implement vector management and sanitation"
+    ],
+    "recommended_references": [
+      "PlantVillage and extension publications on TYLCV and whitefly management"
+    ]
+  },
+
+  "Tomato___healthy": {
+    "common_name": "Healthy tomato",
+    "scientific_name": null,
+    "pathogen_type": "healthy",
+    "primary_hosts": ["Solanum lycopersicum"],
+    "key_symptoms": ["No visible disease; normal leaf shape, color and fruit development"],
+    "management": ["Maintain sanitation, monitoring, and use certified seed/transplants"]
+  }
+}

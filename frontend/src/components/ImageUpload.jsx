@@ -34,7 +34,7 @@ export default function ImageUpload({ onDiagnosis }) {
     try {
       const res = await diagnoseImage(file)
       setResult(res)
-      if (onDiagnosis) onDiagnosis(res)
+      if (onDiagnosis) onDiagnosis(res, { from: 'image' })
     } catch {
       setError('Diagnosis failed. कृपया दोबारा कोशिश करें।')
     } finally {

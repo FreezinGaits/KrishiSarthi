@@ -141,6 +141,13 @@ async def chat(request: ChatRequest):
         request.language,
     )
 
+    # ── Retrieve History ──────────────────────────
+    from app.services.memory_service import memory_service
+    chat_history = memory_service.get_chat_history(session_id, limit=6)
+    
+    # Save user message
+    memory_service.add_message(session_id, "user", request.message)
+
     # ── Run agent ─────────────────────────────────
     try:
         from app.services.agent_service import run_agent
@@ -152,7 +159,12 @@ async def chat(request: ChatRequest):
             longitude=request.longitude,
             language=request.language,
             request_id=request_id,
+            chat_history=chat_history,  # Pass history to agent
         )
+        
+        # Save agent response
+        memory_service.add_message(session_id, "assistant", result.reply)
+        
         logger.info("[%s] Agent response generated", request_id)
         return result
 

@@ -1,23 +1,19 @@
 """
-EfficientNet-B0 Crop Disease Classifier — Training Script
+EfficientNet-B2 Crop Disease Classifier — Training Script
 
-Trains a disease classifier on PlantVillage + Rice Leaf Disease datasets.
-Uses transfer learning with EfficientNet-B0 pretrained on ImageNet.
+Trains a disease classifier on PlantVillage dataset.
+Uses transfer learning with EfficientNet-B2 pretrained on ImageNet.
 
 Usage:
-    cd KrishiSarthi
     uv run python ai-service/train_classifier.py
 
 This will:
-1. Load & combine PlantVillage and Rice Leaf Disease datasets
-2. Apply data augmentation
-3. Fine-tune EfficientNet-B0 for the combined class set
+1. Load & prepare PlantVillage dataset
+2. Apply strong data augmentation
+3. Fine-tune EfficientNet-B2
 4. Save trained model to ai-service/models/classifier.pth
 5. Save class labels to ai-service/class_labels.json
 6. Generate training report
-
-Required packages (should be in your venv):
-    pip install torch torchvision pillow tqdm
 """
 
 from __future__ import annotations
@@ -46,7 +42,9 @@ MODEL_SAVE_PATH = MODELS_DIR / "classifier.pth"
 CLASS_LABELS_PATH = BASE_DIR / "class_labels.json"
 
 # Dataset directories
+# PLANTVILLAGE_DIR = DATA_DIR / "PlantVillage"
 PLANTVILLAGE_DIR = DATA_DIR / "PlantVillage"
+
 RICE_DIR = DATA_DIR / "rice_leaf_diseases"
 PLANTDOC_DIR = DATA_DIR / "PlantDoc-Dataset" / "train"
 
@@ -57,7 +55,7 @@ LEARNING_RATE = 0.001
 LR_STEP_SIZE = 5
 LR_GAMMA = 0.3
 TRAIN_SPLIT = 0.85
-IMAGE_SIZE = 224
+IMAGE_SIZE = 260
 NUM_WORKERS = 0  # Windows-safe default
 
 # ── Class name mapping ───────────────────────────
@@ -85,6 +83,26 @@ FOLDER_TO_CLASS = {
     "Bacterial leaf blight": "Rice___Bacterial_Blight",
     "Brown spot": "Rice___Brown_Spot",
     "Leaf smut": "Rice___Leaf_Smut",
+    # PlantDoc mappings
+    "Tomato leaf late blight": "Tomato___Late_blight",
+    "Tomato leaf bacterial spot": "Tomato___Bacterial_spot",
+    "Tomato leaf mosaic virus": "Tomato___Mosaic_Virus",
+    "Tomato leaf yellow virus": "Tomato___YellowLeaf_Curl_Virus",
+    "Tomato Early blight leaf": "Tomato___Early_blight",
+    "Tomato Septoria leaf spot": "Tomato___Septoria_leaf_spot",
+    "Tomato mold leaf": "Tomato___Leaf_Mold",
+    "Tomato leaf": "Tomato___healthy",
+
+    "Potato leaf early blight": "Potato___Early_blight",
+    "Potato leaf late blight": "Potato___Late_blight",
+
+    "Bell_pepper leaf": "Pepper___healthy",
+    "Bell_pepper leaf spot": "Pepper___Bacterial_spot",
+
+    "Apple Scab Leaf": "Apple___Scab",
+    "Apple rust leaf": "Apple___Rust",
+    "Apple leaf": "Apple___healthy",
+
 }
 
 
@@ -198,8 +216,13 @@ def train():
 
     # ── Discover classes ──────────────────────────
     print("\n📂 Discovering datasets...")
-    data_dirs = [PLANTVILLAGE_DIR, RICE_DIR]
+    # data_dirs = [PLANTVILLAGE_DIR, RICE_DIR, PLANTDOC_DIR]
+    data_dirs = [PLANTVILLAGE_DIR]
     _, class_keys = discover_classes(data_dirs)
+    print("\nDetected Classes:")
+    for cls in class_keys:
+        print(" -", cls)
+
     num_classes = len(class_keys)
     print(f"\n  ✅ Found {num_classes} classes")
 
@@ -226,24 +249,54 @@ def train():
 
     # ── Create dataset ────────────────────────────
     print("\n📦 Building combined dataset (this may take a minute)...")
-    full_dataset = create_combined_dataset(data_dirs, class_keys, train_transforms)
+    combined_dir = DATA_DIR / "_combined_training"
 
-    # Split train/val
+    # Build once
+    _ = create_combined_dataset(data_dirs, class_keys, train_transforms)
+
+    full_dataset = datasets.ImageFolder(str(combined_dir), transform=train_transforms)
+
     train_size = int(TRAIN_SPLIT * len(full_dataset))
     val_size = len(full_dataset) - train_size
+
     train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
 
-    # Override val transforms (no augmentation)
-    val_dataset.dataset.transform = val_transforms
+    # IMPORTANT: create separate val dataset object
+    val_dataset = torch.utils.data.Subset(
+        datasets.ImageFolder(str(combined_dir), transform=val_transforms),
+        val_dataset.indices
+    )
+
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
+
+
+
+    from collections import Counter
+
+    targets = [train_dataset.dataset.targets[i] for i in train_dataset.indices]
+
+
+    class_counts = Counter(targets)
+
+    total_samples = sum(class_counts.values())
+    class_weights = []
+
+    for i in range(num_classes):
+        class_weights.append(total_samples / class_counts[i])
+
+    class_weights = torch.tensor(class_weights, dtype=torch.float32).to(device)
+
+    criterion = nn.CrossEntropyLoss(weight=class_weights, label_smoothing=0.05)
+
+
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS)
 
     print(f"  📊 Train: {train_size} | Val: {val_size}")
 
     # ── Build model ───────────────────────────────
-    print("\n🧠 Building EfficientNet-B0 model...")
-    model = models.efficientnet_b0(weights=models.EfficientNet_B0_Weights.IMAGENET1K_V1)
+    print("\n🧠 Building EfficientNet-B2 model...")
+    model = models.efficientnet_b2(weights=models.EfficientNet_B2_Weights.IMAGENET1K_V1)
 
     # Freeze backbone for first few epochs (transfer learning)
     for param in model.features.parameters():
@@ -253,9 +306,24 @@ def train():
     model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
     model = model.to(device)
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    # criterion = nn.CrossEntropyLoss()
+    optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=LR_STEP_SIZE, gamma=LR_GAMMA)
+
+
+    # ── MixUp augmentation ─────────────────────────────
+    def mixup_data(x, y, alpha=0.2):
+        import numpy as np
+        lam = np.random.beta(alpha, alpha)
+        batch_size = x.size(0)
+        index = torch.randperm(batch_size).to(x.device)
+
+        mixed_x = lam * x + (1 - lam) * x[index]
+        y_a, y_b = y, y[index]
+
+        return mixed_x, y_a, y_b, lam
+
+
 
     # ── Training loop ─────────────────────────────
     print(f"\n🚀 Starting training for {NUM_EPOCHS} epochs...\n")
@@ -268,7 +336,7 @@ def train():
             print("  🔓 Unfreezing backbone layers (fine-tuning)...")
             for param in model.features.parameters():
                 param.requires_grad = True
-            optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE * 0.1)
+            optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE * 0.1)
             scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=LR_STEP_SIZE, gamma=LR_GAMMA)
 
         # ── Train phase ──
@@ -280,15 +348,22 @@ def train():
             images, labels = images.to(device), labels.to(device)
 
             optimizer.zero_grad()
+            images, targets_a, targets_b, lam = mixup_data(images, labels)
             outputs = model(images)
-            loss = criterion(outputs, labels)
+            loss = lam * criterion(outputs, targets_a) + (1 - lam) * criterion(outputs, targets_b)
+
             loss.backward()
             optimizer.step()
 
             running_loss += loss.item() * images.size(0)
             _, preds = torch.max(outputs, 1)
-            running_correct += (preds == labels).sum().item()
-            running_total += labels.size(0)
+            running_correct += (
+                lam * (preds == targets_a).sum().item() +
+                (1 - lam) * (preds == targets_b).sum().item()
+            )
+
+            running_total += targets_a.size(0)
+
 
             pbar.set_postfix(loss=f"{loss.item():.4f}", acc=f"{running_correct/running_total:.3f}")
 

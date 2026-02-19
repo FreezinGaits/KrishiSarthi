@@ -33,7 +33,7 @@ export async function diagnoseImage(imageFile) {
   });
 }
 
-export async function chatWithAgent(message, sessionId = '', imageBase64 = null, lat = null, lng = null, language = 'hi') {
+export async function chatWithAgent(message, sessionId = '', imageBase64 = null, lat = null, lng = null, language = 'hi', options = {}) {
   return request('/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -44,9 +44,11 @@ export async function chatWithAgent(message, sessionId = '', imageBase64 = null,
       latitude: lat,
       longitude: lng,
       language,
+      options, // extra options (e.g., { answer_length: 'short' })
     }),
   });
 }
+
 
 export async function findVendors(lat, lng, query = 'pesticide shop', radiusKm = 10) {
   return request('/find-vendors', {

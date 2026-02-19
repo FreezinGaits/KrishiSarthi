@@ -1,3 +1,4 @@
+# D:\Code Playground\KrishiSarthi\backend\app\services\agent_service.py
 """
 Agentic AI Orchestration Service — LangChain Agent
 
@@ -21,6 +22,7 @@ import re
 import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+from app.services.llm_service import generate_llm_response, _build_llm
 
 from app.config import get_settings
 from app.models.schemas import (
@@ -57,9 +59,9 @@ INTENT_KEYWORDS = {
                "solution", "prevent", "manage", "control"],
     },
     "greeting": {
-        "hi": ["namaste", "namaskar", "hello", "hi", "kaise", "madad", "sahayata",
-               "help", "shuruaat", "start"],
-        "en": ["hello", "hi", "hey", "namaste", "help", "start", "begin"],
+        "hi": ["namaste", "namaskar", "hello", "hi", "madad", "sahayata",
+               "shuruaat", "start"],
+        "en": ["hello", "hi", "hey", "namaste", "start", "begin"],
     },
     "identity": {
         "hi": ["kaun ho", "tumhara naam", "kya karte ho", "krishi sarthi", "antigravity"],
@@ -91,8 +93,21 @@ def _detect_intent(message: str, has_image: bool = False) -> str:
                     score += 1
         scores[intent] = score
 
+    # If crop mentioned + disease-like words, treat as disease
+    msg_lower = message.lower()
+
+    disease_words = [
+        "yellow", "curl", "curling", "spots", "lesions",
+        "wilt", "rot", "blight", "rust", "mold",
+        "dry", "dying", "infection"
+    ]
+
+    if any(word in msg_lower for word in disease_words):
+        return "disease_diagnosis"
+
     if not any(scores.values()):
         return "general_question"
+
 
     return max(scores, key=scores.get)
 
@@ -109,6 +124,8 @@ def _detect_crop_from_text(message: str) -> Optional[str]:
         "sarson": "mustard", "mustard": "mustard", "सरसों": "mustard",
         "cotton": "cotton", "kapas": "cotton", "कपास": "cotton",
         "sugarcane": "sugarcane", "ganna": "sugarcane", "गन्ना": "sugarcane",
+        "strawberry": "strawberry",
+        "berries": "strawberry",
     }
     for keyword, crop in crop_map.items():
         if keyword in msg_lower:
@@ -124,11 +141,14 @@ async def _run_langchain_agent(
     longitude: Optional[float],
     language: str,
     request_id: str,
+    chat_history: Optional[List[Dict[str, str]]] = None,
 ) -> ChatResponse:
     """
     Run the LangChain agent with tools for disease diagnosis,
     vendor search, and knowledge retrieval.
     """
+    if chat_history is None:
+        chat_history = []
     from langchain_openai import ChatOpenAI
     from langchain.agents import AgentExecutor, create_openai_tools_agent
     from langchain.tools import Tool
@@ -189,14 +209,13 @@ async def _run_langchain_agent(
         description="Find nearby pesticide shops and agricultural supply vendors. Input: search query (e.g., 'pesticide shop', 'fertilizer').",
     ))
 
-    # Tool: Search knowledge
     async def _tool_knowledge(query: str) -> str:
-        """Search agricultural knowledge base."""
+        """Search agricultural knowledge base using RAG."""
         try:
-            from app.services.rag_service import search_knowledge
-            results = await search_knowledge(query=query, top_k=3, request_id=request_id)
-            docs = [{"title": r.title, "content": r.content[:500]} for r in results]
-            return json.dumps(docs, ensure_ascii=False)
+            from app.services.rag_service import query_rag
+            # Format history for RAG (role: content strings)
+            history_strs = [f"{m.get('role')}: {m.get('content')}" for m in chat_history] if chat_history else []
+            return await query_rag(query, request_id=request_id, chat_history=history_strs)
         except Exception as e:
             return f"Knowledge search error: {str(e)}"
 
@@ -246,23 +265,10 @@ Be empathetic, supportive, and practical. Remember: many farmers have limited fo
 
     # ── Create agent ──────────────────────────────
     # ── Create agent ──────────────────────────────
-    if settings.grok_api_key:
-        llm = ChatOpenAI(
-            base_url=settings.grok_base_url,
-            api_key=settings.grok_api_key,
-            model=settings.grok_model,
-            temperature=0.3,
-            max_tokens=1500,
-            request_timeout=10,
-        )
-    else:
-        llm = ChatOpenAI(
-            model=settings.openai_model,
-            api_key=settings.openai_api_key,
-            temperature=0.3,
-            max_tokens=1500,
-            request_timeout=10,
-        )
+    # Use our llm_service to pick Groq or OpenAI
+    from app.services.llm_service import _build_llm
+    llm = _build_llm()
+
 
     agent = create_openai_tools_agent(llm, tools, prompt)
     executor = AgentExecutor(
@@ -275,10 +281,20 @@ Be empathetic, supportive, and practical. Remember: many farmers have limited fo
     )
 
     # ── Run agent ─────────────────────────────────
+    # ── Run agent ─────────────────────────────────
+    # Convert history to LangChain format
+    from langchain_core.messages import HumanMessage, AIMessage
+    lc_history = []
+    for msg in chat_history:
+        if msg.get("role") == "user":
+            lc_history.append(HumanMessage(content=msg.get("content", "")))
+        elif msg.get("role") == "assistant":
+            lc_history.append(AIMessage(content=msg.get("content", "")))
+
     result = await executor.ainvoke({
         "input": message,
         "language": language,
-        "chat_history": [],
+        "chat_history": lc_history,
     })
 
     reply = result.get("output", "I could not process your request. Please try again.")
@@ -350,6 +366,7 @@ async def _run_rule_based_agent(
     longitude: Optional[float],
     language: str,
     request_id: str,
+    chat_history: Optional[List[Dict[str, str]]] = None,
 ) -> ChatResponse:
     """
     Rule-based orchestrator for DEMO_MODE.
@@ -366,71 +383,99 @@ async def _run_rule_based_agent(
     reply_parts: List[str] = []
 
     # ── Handle disease diagnosis ──────────────────
-    if intent == "disease_diagnosis":
+    # ── Handle disease diagnosis ONLY if image exists ──────────────────
+    if intent == "disease_diagnosis" and image_base64:
+
         try:
+
             from app.services.classifier_service import classify_image
 
-            if image_base64:
-                img_bytes = base64.b64decode(image_base64)
-                diagnosis_data = await classify_image(img_bytes, filename=f"{crop or 'crop'}_leaf.jpg", request_id=request_id)
-            else:
-                # No image but disease-related query — use crop hint
-                diagnosis_data = await classify_image(b"demo", filename=f"{crop or 'tomato'}_leaf.jpg", request_id=request_id)
+            img_bytes = base64.b64decode(image_base64)
 
-            reply_parts.append(
-                f"🌿 **जांच परिणाम / Diagnosis Result:**\n"
-                f"• **रोग / Disease:** {diagnosis_data.top_disease}\n"
-                f"• **विश्वास / Confidence:** {diagnosis_data.top_confidence:.0%}\n\n"
-                f"**उपचार / Treatment:**\n{diagnosis_data.treatment}\n\n"
-                f"**अनुशंसित कीटनाशक / Recommended Pesticide:** {diagnosis_data.pesticide}"
-            )
+            # Call classifier service for real (do not fabricate demo data)
+            try:
+                diagnosis_data = await classify_image(
+                    img_bytes,
+                    filename=f"{crop or 'crop'}_leaf.jpg",
+                    request_id=request_id
+                )
+            except Exception as e:
+                logger.error("[%s] classify_image failed: %s", request_id, str(e))
+                diagnosis_data = None
+
+            if diagnosis_data:
+                reply_parts.append(
+                    f"🌿 **जांच परिणाम / Diagnosis Result:**\n"
+                    f"• **रोग / Disease:** {diagnosis_data.top_disease}\n"
+                    f"• **विश्वास / Confidence:** {diagnosis_data.top_confidence:.0%}\n\n"
+                    f"**उपचार / Treatment:**\n{diagnosis_data.treatment}\n\n"
+                    f"**अनुशंसित कीटनाशक / Recommended Pesticide:** {diagnosis_data.pesticide}"
+                )
+            else:
+                reply_parts.append("❌ रोग की पहचान में समस्या हुई। कृपया फिर से फोटो भेजें।")
+
+
         except Exception as e:
+
             logger.error("[%s] Classifier failed: %s", request_id, str(e))
+
             reply_parts.append("❌ रोग की पहचान में समस्या हुई। कृपया फिर से कोशिश करें।")
 
+
     # ── Handle general questions (fallback to RAG) ──
-    if intent in ("general_question", "treatment_advice") or (intent == "disease_diagnosis" and not diagnosis_data):
+    # ── Handle ALL text questions using RAG ──
+    if diagnosis_data is None and intent not in ["greeting", "identity", "small_talk"]:
+
+
         try:
-            from app.services.rag_service import search_knowledge
+            from app.services.rag_service import query_rag
             # Use the full message as query
             query = message
             if crop and crop not in query.lower():
                 query = f"{crop} {query}"
             
-            knowledge_results = await search_knowledge(
-                query=query, 
-                top_k=2, 
-                request_id=request_id,
-                crop=crop
-            )
+            # Use RAG Chain to get grounded answer
+            # Format history for RAG
+            history_strs = [f"{m.get('role')}: {m.get('content')}" for m in chat_history] if chat_history else []
+            rag_response = await query_rag(query, request_id=request_id, chat_history=history_strs)
+            reply_parts.append(f"📚 **जानकारी / Information:**\n{rag_response}")
 
-            if knowledge_results and knowledge_results[0].relevance_score > 0.05: # Lower threshold for general queries
-                top_result = knowledge_results[0]
-                sources.append(top_result.title)
-                
-                reply_parts.append(
-                    f"📚 **जानकारी / Information:**\n"
-                    f"{top_result.content}"
-                )
-                
-                if len(knowledge_results) > 1:
-                    second = knowledge_results[1]
-                    if second.relevance_score > 0.1:
-                        sources.append(second.title)
-                        reply_parts.append(
-                            f"\n\n**और जानकारी / More Info:**\n"
-                            f"{second.content[:300]}..."
-                        )
-            elif crop:
-                # No relevant results found FOR THIS CROP
-                reply_parts.append(
-                    f"क्षमा करें, मेरे पास **{crop}** की इस बीमारी के बारे में अभी जानकारी नहीं है।\n"
-                    f"Sorry, I don't have specific information about this **{crop}** disease yet."
-                )
         except Exception as e:
             logger.error("[%s] RAG search failed: %s", request_id, str(e))
 
-    # ── Handle greeting ───────────────────────────
+    # ── Handle vendor search ──────────────────────
+    if intent == "vendor_search":
+        if not latitude or not longitude:
+            reply_parts.append(
+                "📍 कृपया अपनी लोकेशन शेयर करें ताकि मैं नज़दीकी दुकानें खोज सकूँ।\n"
+                "Please share your location to find nearby shops."
+            )
+        else:
+            try:
+                from app.services.vendor_service import search_vendors
+                v_result = await search_vendors(
+                    latitude=latitude, longitude=longitude,
+                    query="pesticide shop", radius_km=10.0,
+                    request_id=request_id
+                )
+                if v_result.vendors:
+                    from app.models.schemas import VendorResult
+                    vendor_data = VendorSearchResponse(
+                        vendors=[VendorResult(**v.dict()) for v in v_result.vendors[:5]],
+                        total=len(v_result.vendors),
+                        search_radius_km=10.0,
+                        source="rule_based"
+                    )
+                    reply_parts.append(f"📍 मुझे {len(v_result.vendors)} नज़दीकी दुकानें मिली हैं:")
+                    for idx, v in enumerate(v_result.vendors[:3], 1):
+                        reply_parts.append(f"{idx}. **{v.name}** ({v.distance_km:.1f} km)\n   📞 {v.phone}")
+                else:
+                    reply_parts.append("📍 आस-पास कोई दुकान नहीं मिली।")
+            except Exception as e:
+                logger.error("Vendor search failed: %s", str(e))
+                reply_parts.append("Vendor search error.")
+
+    # ── Handle general questions (fallback to RAG) ──
     if intent == "greeting":
         greeting = (
             "🙏 **नमस्ते! मैं कृषि-सारथी हूँ — आपका AI कृषि सहायक।**\n\n"
@@ -446,9 +491,9 @@ async def _run_rule_based_agent(
     # ── Handle identity ───────────────────────────
     if intent == "identity":
         reply_parts.append(
-            "मैं **कृषि-सारथी** हूँ, एक AI सिस्टम जो Google DeepMind और Antigravity टीम द्वारा बनाया गया है।\n"
-            "मेरा उद्देश्य किसानों की मदद करना है। 🚜\n\n"
-            "I am **Krishi-Sarthi**, an AI assistant designed to help farmers with crop diagnosis and advice."
+            "मैं **कृषि-सारथी टीम** और **Google DeepMind** द्वारा विकसित एक AI सहायक हूँ।\n"
+            "मेरा उद्देश्य आपकी खेती को आसान और लाभदायक बनाना है। 🚜\n\n"
+            "I am an AI assistant developed by **Krishi-Sarthi Team** and **Google DeepMind**."
         )
 
     # ── Handle small talk ─────────────────────────
@@ -543,6 +588,7 @@ async def run_agent(
     longitude: Optional[float] = None,
     language: str = "hi",
     request_id: str = "",
+    chat_history: Optional[List[Dict[str, str]]] = None,
 ) -> ChatResponse:
     """
     Main entry point for the agentic AI.
@@ -567,6 +613,9 @@ async def run_agent(
     """
     if not session_id:
         session_id = str(uuid.uuid4())
+    
+    if chat_history is None:
+        chat_history = []
 
     logger.info(
         "[%s] Agent invoked: session=%s, msg='%s', image=%s, loc=(%s,%s), lang=%s",
@@ -588,6 +637,7 @@ async def run_agent(
                 longitude=longitude,
                 language=language,
                 request_id=request_id,
+                chat_history=chat_history,
             )
         except Exception as e:
             logger.error("[%s] LangChain agent failed: %s — falling back to rule-based", request_id, str(e))
@@ -602,4 +652,5 @@ async def run_agent(
         longitude=longitude,
         language=language,
         request_id=request_id,
+        chat_history=chat_history,
     )
