@@ -1,0 +1,11 @@
+(krishisarthi) PS D:\Code Playground\KrishiSarthi> npm install -g ngrok
+
+added 44 packages in 10s
+
+10 packages are looking for funding
+  run `npm fund` for details
+(krishisarthi) PS D:\Code Playground\KrishiSarthi> ngrok http 8000
+(krishisarthi) PS D:\Code Playground\KrishiSarthi> ngrok config check
+(krishisarthi) PS D:\Code Playground\KrishiSarthi> ngrok config add-authtoken 39t8yDvb1FUNTpjxa9d4rarW7wj_3Rf5QWSc57ZVB1gSo2Vks
+(krishisarthi) PS D:\Code Playground\KrishiSarthi> ngrok http 8000
+(krishisarthi) PS D:\Code Playground\KrishiSarthi> 

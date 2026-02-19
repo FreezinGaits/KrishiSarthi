@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('chat')
   const [diagnosis, setDiagnosis] = useState(null)
   const [vendors, setVendors] = useState([])
+  const [vendorStatus, setVendorStatus] = useState('idle') // idle | loading | loaded | error
   const [location, setLocation] = useState(null)
   const [sessionId] = useState(() => `session-${Date.now()}`)
   const [chatInput, setChatInput] = useState('')
@@ -29,9 +30,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (location) {
-      findVendors(location.lat, location.lng)
-        .then((res) => setVendors(res.vendors || []))
-        .catch(() => {})
+      setVendorStatus('loading')
+      findVendors(location.lat, location.lng, 'pesticide shop', 50)
+        .then((res) => {
+          setVendors(res.vendors || [])
+          setVendorStatus('loaded')
+        })
+        .catch((err) => {
+          console.error('Vendor fetch failed:', err)
+          setVendorStatus('error')
+        })
     }
   }, [location])
 
@@ -145,7 +153,7 @@ export default function Dashboard() {
           <div className="dash-panel vendors-panel">
             <h2 className="panel-title">📍 Nearby Vendors</h2>
             <div className="vendors-layout">
-              <VendorList vendors={vendors} />
+              <VendorList vendors={vendors} status={vendorStatus} />
               <MapView vendors={vendors} center={location} />
             </div>
           </div>

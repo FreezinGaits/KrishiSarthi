@@ -455,6 +455,7 @@ async def find_vendors(data: dict):
     print("Vendor file path:", VENDOR_DATA_PATH)
     print("Vendor file exists:", os.path.exists(VENDOR_DATA_PATH))
     print("Vendors loaded:", len(vendors_data))
+    print("Vendors loaded:", vendors_data)
 
     results.sort(key=lambda x: x["distance_km"])
     

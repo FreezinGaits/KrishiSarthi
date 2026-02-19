@@ -1,11 +1,29 @@
 import './VendorList.css'
 
-export default function VendorList({ vendors = [] }) {
+export default function VendorList({ vendors = [], status = 'idle' }) {
+  if (status === 'loading') {
+    return (
+      <div className="vendor-empty">
+        <span>⏳</span>
+        <p>Loading vendor data...</p>
+      </div>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <div className="vendor-empty">
+        <span>❌</span>
+        <p>Failed to load vendors. Check if backend is running.</p>
+      </div>
+    )
+  }
+
   if (!vendors.length) {
     return (
       <div className="vendor-empty">
         <span>📍</span>
-        <p>Loading vendor data...</p>
+        <p>No vendors found nearby. Try sharing your location.</p>
       </div>
     )
   }

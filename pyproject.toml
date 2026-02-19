@@ -32,4 +32,5 @@ dependencies = [
     "torchvision>=0.25.0",
     "uvicorn[standard]>=0.30.6",
     "langchain-groq>=1.1.2",
+    "google-cloud-translate>=3.24.0",
 ]
