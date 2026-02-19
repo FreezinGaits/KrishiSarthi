@@ -1,4 +1,7 @@
 # ai_service/app.py
+from dotenv import load_dotenv
+load_dotenv()  # Load .env file so GROQ_API_KEY etc. are available
+
 from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware

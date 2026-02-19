@@ -58,31 +58,16 @@ export default function VoiceRecorder({ onTranscript }) {
       setError('Speech recognition error.')
     }
 
-    recognition.onend = async () => {
+    recognition.onend = () => {
       setRecording(false)
 
       const finalText = transcriptRef.current.trim()
       if (!finalText) return
 
-      setProcessing(true)
-
-      try {
-        const res = await chatWithAgent(
-          finalText,
-          `voice-${Date.now()}`,
-          null,
-          null,
-          null,
-          'hi',
-          {}
-        )
-
-        setTranscript(prev => prev + "\n\n🤖 " + (res.reply || 'No reply received.'))
-      } catch (err) {
-        console.error(err)
-        setError('AI response failed.')
-      } finally {
-        setProcessing(false)
+      // Pass transcript to Dashboard → ChatInterface for proper AI processing
+      // (ChatInterface has session context, location, and RAG access)
+      if (onTranscript) {
+        onTranscript(finalText)
       }
     }
 
