@@ -135,8 +135,10 @@ EXPECTED_API_KEY = "krishi-sarthi-api-key-change-this"
 
 @app.middleware("http")
 async def api_key_check(request: Request, call_next):
-    # check only /api endpoints
-    if request.url.path.startswith("/api"):
+    path = request.url.path.rstrip("/")
+    # Skip health + session endpoints from API key requirement
+    skip = ("/api/health", "/api/sessions")
+    if path.startswith("/api") and not path.startswith(skip):
         key = request.headers.get("x-api-key") or request.headers.get("X-API-Key")
         if key != EXPECTED_API_KEY:
             return JSONResponse({"error": "invalid api key"}, status_code=401)

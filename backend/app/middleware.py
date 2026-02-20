@@ -59,13 +59,15 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
     """
 
     SKIP_PATHS = {"/", "/health", "/api/health", "/docs", "/redoc", "/openapi.json"}
+    SKIP_PREFIXES = ("/api/health", "/api/sessions", "/docs", "/redoc")
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         # Skip non-API routes and OPTIONS (CORS preflight)
-        path = request.url.path
+        path = request.url.path.rstrip("/")
         if (
             request.method == "OPTIONS"
             or path in self.SKIP_PATHS
+            or path.startswith(self.SKIP_PREFIXES)
             or not path.startswith("/api")
         ):
             return await call_next(request)

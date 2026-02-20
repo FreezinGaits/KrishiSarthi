@@ -26,6 +26,53 @@ const ChatInterface = forwardRef(function ChatInterface(
   const fileRef = useRef()
   const [pendingImage, setPendingImage] = useState(null)
   const [pendingPreview, setPendingPreview] = useState(null)
+  const [speakingId, setSpeakingId] = useState(null)
+
+  // ── Text-to-Speech ─────────────────────────────
+  function handleSpeak(text, msgIndex) {
+    const synth = window.speechSynthesis
+    if (!synth) return
+
+    // If already speaking this message, stop it
+    if (speakingId === msgIndex) {
+      synth.cancel()
+      setSpeakingId(null)
+      return
+    }
+
+    // Stop any ongoing speech
+    synth.cancel()
+
+    // Clean text: strip emoji, markdown bold, etc.
+    const clean = text
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/#{1,6}\s/g, '')
+      .trim()
+
+    const utter = new SpeechSynthesisUtterance(clean)
+    utter.lang = 'hi-IN'
+    utter.rate = 0.95
+    utter.pitch = 1.0
+
+    // Try to pick a Hindi voice
+    const voices = synth.getVoices()
+    const hindiVoice = voices.find((v) => v.lang.startsWith('hi'))
+    if (hindiVoice) utter.voice = hindiVoice
+
+    utter.onend = () => setSpeakingId(null)
+    utter.onerror = () => setSpeakingId(null)
+
+    setSpeakingId(msgIndex)
+    synth.speak(utter)
+  }
+
+  // Cancel speech on session switch
+  useEffect(() => {
+    window.speechSynthesis?.cancel()
+    setSpeakingId(null)
+  }, [sessionId])
 
   useEffect(() => { if (initialInput) setInput(initialInput) }, [initialInput])
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
@@ -143,6 +190,15 @@ const ChatInterface = forwardRef(function ChatInterface(
                 m.diagnosis.disease !== 'Unknown' && (
                   <DiagnosisCard data={m.diagnosis} compact />
                 )}
+              {m.role === 'assistant' && m.text && (
+                <button
+                  className={`tts-btn ${speakingId === i ? 'speaking' : ''}`}
+                  onClick={(e) => { e.stopPropagation(); handleSpeak(m.text, i) }}
+                  title={speakingId === i ? 'Stop speaking' : 'Listen to reply'}
+                >
+                  {speakingId === i ? '⏹️' : '🔊'}
+                </button>
+              )}
             </div>
           </div>
         ))}

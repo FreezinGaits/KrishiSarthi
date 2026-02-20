@@ -392,7 +392,7 @@ async function sendMessage(text, imageBase64 = null) {
 
         const resp = await fetch(`${API_BASE}/chat`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-API-Key': 'krishi-sarthi-api-key-change-this' },
             body: JSON.stringify(body),
         });
 
@@ -557,7 +557,7 @@ locationBtn.addEventListener('click', () => {
             try {
                 const resp = await fetch(`${API_BASE}/find-vendors`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'X-API-Key': 'krishi-sarthi-api-key-change-this' },
                     body: JSON.stringify({
                         latitude,
                         longitude,
@@ -645,7 +645,9 @@ function showVendors(data) {
 
 async function checkHealth() {
     try {
-        const resp = await fetch(`${API_BASE}/health`);
+        const resp = await fetch(`${API_BASE}/health`, {
+            headers: { 'X-API-Key': 'krishi-sarthi-api-key-change-this' },
+        });
         if (resp.ok) {
             statusDot.classList.add('connected');
             statusDot.title = 'Backend connected';
