@@ -35,7 +35,7 @@ export default function AuthProvider({ children }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/dashboard',
+        redirectTo: window.location.origin + '/choose-plan',
       },
     })
     if (error) console.error('Google sign-in error:', error.message)
