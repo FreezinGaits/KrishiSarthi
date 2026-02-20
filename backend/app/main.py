@@ -62,7 +62,7 @@ app.add_middleware(
 register_middleware(app)
 
 # ── Routers ───────────────────────────────────────
-from app.routers import speech, diagnosis, vendors, chat, notifications, health  # noqa: E402
+from app.routers import speech, diagnosis, vendors, chat, notifications, health, marketplace  # noqa: E402
 
 app.include_router(speech.router)
 app.include_router(diagnosis.router)
@@ -70,6 +70,7 @@ app.include_router(vendors.router)
 app.include_router(chat.router)
 app.include_router(notifications.router)
 app.include_router(health.router)
+app.include_router(marketplace.router)
 
 
 # ── Health Check ──────────────────────────────────

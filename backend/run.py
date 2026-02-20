@@ -107,6 +107,7 @@ def verify_services():
         "RAG Knowledge": "app.services.rag_service",
         "Agent": "app.services.agent_service",
         "n8n Webhooks": "app.services.n8n_service",
+        "Marketplace": "app.services.marketplace_service",
     }
 
     all_ok = True

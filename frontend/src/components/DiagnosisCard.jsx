@@ -1,4 +1,54 @@
+import { useState, useRef, useCallback } from 'react'
 import './DiagnosisCard.css'
+
+// ── Speech helper ──
+function speakText(text) {
+  if (!window.speechSynthesis) return
+  window.speechSynthesis.cancel()
+  const utterance = new SpeechSynthesisUtterance(text)
+  utterance.lang = 'hi-IN'
+  utterance.rate = 0.9
+  // Try to pick a Hindi voice
+  const voices = window.speechSynthesis.getVoices()
+  const hindiVoice = voices.find(v => v.lang.startsWith('hi'))
+  if (hindiVoice) utterance.voice = hindiVoice
+  window.speechSynthesis.speak(utterance)
+}
+
+function SpeakButton({ text }) {
+  const [playing, setPlaying] = useState(false)
+
+  const handleSpeak = (e) => {
+    e.stopPropagation()
+    if (playing) {
+      window.speechSynthesis.cancel()
+      setPlaying(false)
+      return
+    }
+    setPlaying(true)
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'hi-IN'
+    utterance.rate = 0.9
+    const voices = window.speechSynthesis.getVoices()
+    const hindiVoice = voices.find(v => v.lang.startsWith('hi'))
+    if (hindiVoice) utterance.voice = hindiVoice
+    utterance.onend = () => setPlaying(false)
+    utterance.onerror = () => setPlaying(false)
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(utterance)
+  }
+
+  return (
+    <button
+      className={`speak-btn ${playing ? 'speaking' : ''}`}
+      onClick={handleSpeak}
+      title="सुनें"
+      aria-label="बोलकर सुनें"
+    >
+      {playing ? '⏹️' : '🔊'}
+    </button>
+  )
+}
 
 export default function DiagnosisCard({ data, compact = false }) {
   if (!data) return null
@@ -15,30 +65,43 @@ export default function DiagnosisCard({ data, compact = false }) {
   // 🔥 Read metadata correctly
   const meta = data.metadata || {}
   
-  const summary = meta.summary || ''
-  const symptoms = meta.symptoms || ''
-  const causes = meta.causes || ''
-  const treatment = meta.treatment || ''
-  const pesticide = meta.pesticide || ''
-  const prevention = meta.prevention || ''
-  
   const severity = confPercent >= 80 ? 'high' : confPercent >= 50 ? 'medium' : 'low'
+
+  // Use Hindi fields with English fallback
+  const commonName = meta.common_name_hi || meta.common_name || disease.replace(/___/g, ' ')
+  const pathogenType = meta.pathogen_type_hi || meta.pathogen_type
+  const keySymptoms = meta.key_symptoms_hi || meta.key_symptoms
+  const transmission = meta.transmission_hi || meta.transmission
+  const culturalControls = meta.cultural_controls_hi || meta.cultural_controls
+  const chemicalControls = meta.chemical_controls_examples_hi || meta.chemical_controls_examples
+  const prevention = meta.prevention_hi || meta.prevention
 
   if (compact) {
     return (
       <div className="diag-compact">
         <span className="diag-badge" data-severity={severity}>{confPercent}%</span>
-        <strong>{disease}</strong>
-        {treatment && <span className="diag-treatment-mini">💊 {treatment.slice(0, 80)}...</span>}
+        <strong>{commonName}</strong>
+        {chemicalControls && <span className="diag-treatment-mini">💊 {(Array.isArray(chemicalControls) ? chemicalControls[0] : chemicalControls).slice(0, 80)}...</span>}
       </div>
     )
   }
+
+  // Build full card text for top-level speak button
+  const fullCardText = [
+    commonName,
+    pathogenType && `रोगज़नक़ का प्रकार: ${pathogenType}`,
+    keySymptoms && `प्रमुख लक्षण: ${keySymptoms.join(', ')}`,
+    transmission && `फैलाव: ${transmission.join(', ')}`,
+    culturalControls && `फसल प्रबंधन: ${culturalControls.join(', ')}`,
+    chemicalControls && `रासायनिक उपचार: ${chemicalControls.join(', ')}`,
+    prevention && `रोकथाम: ${prevention.join(', ')}`
+  ].filter(Boolean).join('। ')
 
   return (
     <div className="diag-card" data-severity={severity}>
       <div className="diag-header">
         <div className="diag-disease">
-          <h3>🔬 {meta.common_name || disease.replace(/___/g, ' ')}</h3>
+          <h3>🔬 {commonName}</h3>
           {meta.scientific_name && (
             <span className="diag-scientific">
               {meta.scientific_name}
@@ -46,78 +109,99 @@ export default function DiagnosisCard({ data, compact = false }) {
           )}
         </div>
   
-        <div className="confidence-ring" data-severity={severity}>
-          <svg viewBox="0 0 36 36" className="ring-svg">
-            <path
-              className="ring-bg"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-            <path
-              className="ring-fill"
-              strokeDasharray={`${confPercent}, 100`}
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-            />
-          </svg>
-          <span className="ring-text">{confPercent}%</span>
+        <div className="diag-header-right">
+          <SpeakButton text={fullCardText} />
+          <div className="confidence-ring" data-severity={severity}>
+            <svg viewBox="0 0 36 36" className="ring-svg">
+              <path
+                className="ring-bg"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path
+                className="ring-fill"
+                strokeDasharray={`${confPercent}, 100`}
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+            </svg>
+            <span className="ring-text">{confPercent}%</span>
+          </div>
         </div>
       </div>
   
-      {meta.pathogen_type && (
+      {pathogenType && (
         <div className="diag-section">
-          <h4>🦠 Pathogen Type</h4>
-          <p>{meta.pathogen_type}</p>
+          <div className="section-header">
+            <h4>🦠 रोगज़नक़ का प्रकार</h4>
+            <SpeakButton text={`रोगज़नक़ का प्रकार: ${pathogenType}`} />
+          </div>
+          <p>{pathogenType}</p>
         </div>
       )}
   
-      {meta.key_symptoms && (
+      {keySymptoms && (
         <div className="diag-section">
-          <h4>🌿 Key Symptoms</h4>
+          <div className="section-header">
+            <h4>🌿 प्रमुख लक्षण</h4>
+            <SpeakButton text={`प्रमुख लक्षण: ${keySymptoms.join('। ')}`} />
+          </div>
           <ul>
-            {meta.key_symptoms.map((s, i) => (
+            {keySymptoms.map((s, i) => (
               <li key={i}>{s}</li>
             ))}
           </ul>
         </div>
       )}
   
-      {meta.transmission && (
+      {transmission && (
         <div className="diag-section">
-          <h4>🔁 Transmission</h4>
+          <div className="section-header">
+            <h4>🔁 फैलाव</h4>
+            <SpeakButton text={`फैलाव: ${transmission.join('। ')}`} />
+          </div>
           <ul>
-            {meta.transmission.map((t, i) => (
+            {transmission.map((t, i) => (
               <li key={i}>{t}</li>
             ))}
           </ul>
         </div>
       )}
   
-      {meta.cultural_controls && (
+      {culturalControls && (
         <div className="diag-section">
-          <h4>🌾 Cultural Controls</h4>
+          <div className="section-header">
+            <h4>🌾 फसल प्रबंधन</h4>
+            <SpeakButton text={`फसल प्रबंधन: ${culturalControls.join('। ')}`} />
+          </div>
           <ul>
-            {meta.cultural_controls.map((c, i) => (
+            {culturalControls.map((c, i) => (
               <li key={i}>{c}</li>
             ))}
           </ul>
         </div>
       )}
   
-      {meta.chemical_controls_examples && (
+      {chemicalControls && (
         <div className="diag-section">
-          <h4>💊 Chemical Controls</h4>
+          <div className="section-header">
+            <h4>💊 रासायनिक उपचार</h4>
+            <SpeakButton text={`रासायनिक उपचार: ${chemicalControls.join('। ')}`} />
+          </div>
           <ul>
-            {meta.chemical_controls_examples.map((c, i) => (
+            {chemicalControls.map((c, i) => (
               <li key={i}>{c}</li>
             ))}
           </ul>
         </div>
       )}
   
-      {meta.prevention && (
+      {prevention && (
         <div className="diag-section">
-          <h4>🛡️ Prevention</h4>
+          <div className="section-header">
+            <h4>🛡️ रोकथाम</h4>
+            <SpeakButton text={`रोकथाम: ${prevention.join('। ')}`} />
+          </div>
           <ul>
-            {meta.prevention.map((p, i) => (
+            {prevention.map((p, i) => (
               <li key={i}>{p}</li>
             ))}
           </ul>

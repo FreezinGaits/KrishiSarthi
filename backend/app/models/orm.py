@@ -41,6 +41,8 @@ class User(Base):
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     phone = Column(String(20), unique=True, nullable=True)
     name = Column(String(100), nullable=True)
+    email = Column(String(200), nullable=True)
+    role = Column(String(20), default="farmer")  # farmer / vendor
     location_lat = Column(Float, nullable=True)
     location_lng = Column(Float, nullable=True)
     language = Column(String(10), default="hi")
@@ -117,4 +119,46 @@ class KnowledgeDocument(Base):
     category = Column(String(100), nullable=True)
     content = Column(Text, nullable=False)
     embedding_status = Column(String(20), default="pending")
+    created_at = Column(DateTime, default=datetime.utcnow, server_default=func.now())
+
+
+# ─────────────────────────────────────────────────
+# Marketplace Models
+# ─────────────────────────────────────────────────
+
+class MarketConversation(Base):
+    """Farmer ↔ Vendor chat conversation."""
+    __tablename__ = "market_conversations"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    farmer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    vendor_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, server_default=func.now())
+
+    messages = relationship("MarketMessage", back_populates="conversation", lazy="selectin")
+
+
+class MarketMessage(Base):
+    """Individual message inside a marketplace conversation."""
+    __tablename__ = "market_messages"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    conversation_id = Column(Integer, ForeignKey("market_conversations.id"), nullable=False)
+    sender_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    message = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow, server_default=func.now())
+
+    conversation = relationship("MarketConversation", back_populates="messages")
+
+
+class MedicineRequest(Base):
+    """Medicine availability request from farmer to vendor."""
+    __tablename__ = "medicine_requests"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    farmer_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    vendor_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    disease_name = Column(String(200), nullable=False)
+    medicine_name = Column(String(200), nullable=False)
+    status = Column(String(20), default="pending")  # pending / confirmed / rejected
     created_at = Column(DateTime, default=datetime.utcnow, server_default=func.now())

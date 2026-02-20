@@ -67,6 +67,7 @@ class Settings(BaseSettings):
     n8n_notification_webhook: str = "/webhook/send-notification"
     n8n_escalation_webhook: str = "/webhook/escalation"
     n8n_retraining_webhook: str = "/webhook/retraining-trigger"
+    n8n_medicine_request_webhook: str = "/webhook/medicine-request"
 
     # ── AI Models ─────────────────────────────────────────
     # ── AI Models ─────────────────────────────────────────

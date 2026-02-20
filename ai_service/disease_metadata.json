@@ -1,13 +1,20 @@
 {
   "Pepper___Bacterial_spot": {
     "common_name": "Bacterial spot (pepper)",
+    "common_name_hi": "जीवाणु धब्बा (शिमला मिर्च)",
     "scientific_name": "Xanthomonas spp. (e.g., Xanthomonas euvesicatoria / X. vesicatoria)",
     "pathogen_type": "bacterium",
+    "pathogen_type_hi": "जीवाणु (बैक्टीरिया)",
     "primary_hosts": ["Capsicum spp. (bell pepper, hot pepper)"],
     "key_symptoms": [
       "Small, water-soaked irregular spots on leaves that may become angular",
       "Lesions on fruit (scabby, raised, dark lesions)",
       "Leaf yellowing and premature defoliation under severe infection"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों पर छोटे, पानी से भीगे अनियमित धब्बे जो कोणीय हो सकते हैं",
+      "फल पर घाव (खुरदुरे, उभरे हुए, गहरे रंग के धब्बे)",
+      "गंभीर संक्रमण में पत्तियों का पीलापन और समय से पहले झड़ना"
     ],
     "diagnostic_clues": [
       "Water-soaked lesions in humid conditions",
@@ -19,11 +26,22 @@
       "Contaminated seed or transplants",
       "Spread on tools, hands, equipment"
     ],
+    "transmission_hi": [
+      "छींटे वाले पानी से फैलता है (बारिश, ऊपर से सिंचाई)",
+      "दूषित बीज या पौध से",
+      "औज़ारों, हाथों और उपकरणों से फैलता है"
+    ],
     "cultural_controls": [
       "Use pathogen-free seed and transplants",
       "Avoid overhead irrigation; use drip irrigation to reduce splash",
       "Remove and destroy infected plant debris; rotate crops",
       "Sanitize tools and hands"
+    ],
+    "cultural_controls_hi": [
+      "रोग-मुक्त बीज और पौध का उपयोग करें",
+      "ऊपर से सिंचाई से बचें; छींटे कम करने के लिए ड्रिप सिंचाई का उपयोग करें",
+      "संक्रमित पौधों के अवशेष हटाकर नष्ट करें; फसल चक्र अपनाएं",
+      "औज़ारों और हाथों को साफ़ रखें"
     ],
     "biological_controls": [
       "Biocontrols are limited; focus on cultural + tolerant varieties where available"
@@ -32,10 +50,19 @@
       "Copper-based bactericides (commonly used protectant)",
       "Use in integrated program; effectiveness can decline due to resistance"
     ],
+    "chemical_controls_examples_hi": [
+      "ताम्बे पर आधारित जीवाणुनाशक (आमतौर पर इस्तेमाल होने वाला सुरक्षात्मक दवा)",
+      "एकीकृत कार्यक्रम में उपयोग करें; प्रतिरोध के कारण प्रभावशीलता कम हो सकती है"
+    ],
     "prevention": [
       "Use certified disease-free seed/transplants",
       "Implement sanitation and cover/spacing to reduce humidity",
       "Choose resistant/tolerant varieties if available"
+    ],
+    "prevention_hi": [
+      "प्रमाणित रोग-मुक्त बीज/पौध का उपयोग करें",
+      "नमी कम करने के लिए स्वच्छता और उचित दूरी रखें",
+      "उपलब्ध होने पर प्रतिरोधी/सहनशील किस्मों का चयन करें"
     ],
     "notes": "Bacterial diseases often respond best to prevention and sanitation; chemical control is supplementary.",
     "recommended_references": [
@@ -46,10 +73,13 @@
 
   "Pepper___healthy": {
     "common_name": "Healthy pepper",
+    "common_name_hi": "स्वस्थ शिमला मिर्च",
     "scientific_name": null,
     "pathogen_type": "healthy",
+    "pathogen_type_hi": "स्वस्थ",
     "primary_hosts": ["Capsicum spp."],
     "key_symptoms": ["No disease symptoms; leaves, stems, and fruit appear normal"],
+    "key_symptoms_hi": ["कोई रोग के लक्षण नहीं; पत्तियाँ, तने और फल सामान्य दिखते हैं"],
     "diagnostic_clues": ["Absence of lesions, chlorosis, necrosis or vector presence"],
     "management": ["Standard good agronomic practices; monitor regularly for pests/diseases"],
     "notes": "Keep good records and collect labelled examples of any new symptoms for diagnosis."
@@ -57,13 +87,20 @@
 
   "Potato___Early_blight": {
     "common_name": "Early blight (potato)",
+    "common_name_hi": "अगेती झुलसा (आलू)",
     "scientific_name": "Alternaria solani",
     "pathogen_type": "fungus",
+    "pathogen_type_hi": "फफूंद (कवक)",
     "primary_hosts": ["Solanum tuberosum (potato)", "Tomato (also susceptible)"],
     "key_symptoms": [
       "Dark, concentric-ring lesions (target-like) on older leaves",
       "Lower leaves affected first, may cause defoliation",
       "Lesions on stems and tuber skin in severe cases"
+    ],
+    "key_symptoms_hi": [
+      "पुरानी पत्तियों पर गहरे, संकेंद्रित-वलय वाले धब्बे (निशाने जैसे)",
+      "पहले निचली पत्तियाँ प्रभावित होती हैं, पत्तियाँ झड़ सकती हैं",
+      "गंभीर मामलों में तनों और कंद की त्वचा पर भी धब्बे"
     ],
     "diagnostic_clues": [
       "Concentric rings within lesions (classic 'target' spot)",
@@ -73,19 +110,36 @@
       "Overwinters in crop debris, cull piles",
       "Spores dispersed by wind and splashing water"
     ],
+    "transmission_hi": [
+      "फसल अवशेषों और कूड़े के ढेर में सर्दियों में जीवित रहता है",
+      "बीजाणु हवा और छींटे वाले पानी से फैलते हैं"
+    ],
     "cultural_controls": [
       "Crop rotation and burying/destroying infected debris",
       "Use certified seed potatoes",
       "Avoid excessive nitrogen which increases lush growth"
+    ],
+    "cultural_controls_hi": [
+      "फसल चक्र अपनाएं और संक्रमित अवशेषों को दबाकर/नष्ट करें",
+      "प्रमाणित बीज आलू का उपयोग करें",
+      "अधिक नाइट्रोजन से बचें जो अत्यधिक पत्ती बढ़ाता है"
     ],
     "biological_controls": ["Experimental; common strategy is IPM combining cultural and chemical"],
     "chemical_controls_examples": [
       "Protectant fungicides (e.g., chlorothalonil)",
       "Some systemic fungicides (strobilurins, DMIs) are used in rotation"
     ],
+    "chemical_controls_examples_hi": [
+      "सुरक्षात्मक फफूंदनाशक (जैसे, क्लोरोथैलोनिल)",
+      "कुछ प्रणालीगत फफूंदनाशक (स्ट्रोबिल्यूरिन, DMI) बारी-बारी से उपयोग करें"
+    ],
     "prevention": [
       "Use resistant/tolerant varieties if available",
       "Good field sanitation and rotation"
+    ],
+    "prevention_hi": [
+      "उपलब्ध होने पर प्रतिरोधी/सहनशील किस्मों का उपयोग करें",
+      "खेत की अच्छी सफाई और फसल चक्र अपनाएं"
     ],
     "recommended_references": [
       "MSU Extension (Potato Diseases: Early Blight)",
@@ -95,13 +149,20 @@
 
   "Potato___Late_blight": {
     "common_name": "Late blight (potato)",
+    "common_name_hi": "पछेती झुलसा (आलू)",
     "scientific_name": "Phytophthora infestans",
     "pathogen_type": "oomycete (water mold)",
+    "pathogen_type_hi": "ऊमाइसीट (जल फफूंद)",
     "primary_hosts": ["Potato (Solanum tuberosum)", "Tomato (Solanum lycopersicum)"],
     "key_symptoms": [
       "Water-soaked, dark lesions on leaves that expand rapidly",
       "White fuzzy sporulation on leaf underside in humid conditions",
       "Rapid collapse of foliage; infected tubers show brownish rot under skin"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों पर पानी से भीगे, गहरे धब्बे जो तेज़ी से फैलते हैं",
+      "नम मौसम में पत्ती के निचले हिस्से पर सफ़ेद रोएंदार बीजाणु",
+      "पत्तियों का तेज़ी से गिरना; संक्रमित कंदों में त्वचा के नीचे भूरी सड़न"
     ],
     "diagnostic_clues": [
       "Very rapid disease spread in cool, wet conditions",
@@ -111,10 +172,19 @@
       "Windborne sporangia and rain splashes",
       "Can be spread by infected seed tubers"
     ],
+    "transmission_hi": [
+      "हवा से उड़ने वाले बीजाणु और बारिश की बूंदों से",
+      "संक्रमित बीज कंदों से भी फैल सकता है"
+    ],
     "cultural_controls": [
       "Use certified seed tubers; remove infected plants and cull tubers",
       "Improve airflow, avoid overhead irrigation",
       "Crop rotation and avoid planting near volunteer potatoes"
+    ],
+    "cultural_controls_hi": [
+      "प्रमाणित बीज कंद का उपयोग करें; संक्रमित पौधे और ख़राब कंद हटाएं",
+      "हवा का प्रवाह बढ़ाएं, ऊपर से सिंचाई से बचें",
+      "फसल चक्र अपनाएं और स्वयंसेवी आलू पौधों के पास न लगाएं"
     ],
     "biological_controls": [
       "Limited; focus on resistant varieties and chemical programs"
@@ -123,9 +193,17 @@
       "Oomycete-active fungicides (phenylamides like metalaxyl/mefenoxam historically; phosphonates/phosphites; other oomycete-specific actives)",
       "Use recommended local fungicide programs and rotate modes of action"
     ],
+    "chemical_controls_examples_hi": [
+      "ऊमाइसीट-सक्रिय फफूंदनाशक (फेनिलएमाइड जैसे मेटालैक्सिल; फॉस्फोनेट/फॉस्फाइट; अन्य ऊमाइसीट-विशिष्ट दवाएं)",
+      "स्थानीय अनुशंसित फफूंदनाशक कार्यक्रम अपनाएं और दवाओं की कार्यविधि बदलते रहें"
+    ],
     "prevention": [
       "Use resistant varieties where available; strict seed certification",
       "Rapid detection & removal to limit outbreaks"
+    ],
+    "prevention_hi": [
+      "जहाँ उपलब्ध हो प्रतिरोधी किस्मों का उपयोग करें; सख़्त बीज प्रमाणन",
+      "प्रकोप सीमित करने के लिए शीघ्र पहचान और हटाना"
     ],
     "recommended_references": [
       "NC State Extension (Potato Late Blight)",
@@ -135,22 +213,32 @@
 
   "Potato___healthy": {
     "common_name": "Healthy potato",
+    "common_name_hi": "स्वस्थ आलू",
     "scientific_name": null,
     "pathogen_type": "healthy",
+    "pathogen_type_hi": "स्वस्थ",
     "primary_hosts": ["Solanum tuberosum"],
     "key_symptoms": ["No disease lesions or discoloration on foliage or tubers"],
+    "key_symptoms_hi": ["पत्तियों या कंदों पर कोई रोग के धब्बे या रंग परिवर्तन नहीं"],
     "management": ["Maintain good seed, rotation, irrigation, and soil health practices"]
   },
 
   "Tomato___Bacterial_spot": {
     "common_name": "Bacterial spot (tomato)",
+    "common_name_hi": "जीवाणु धब्बा (टमाटर)",
     "scientific_name": "Xanthomonas spp. (e.g., X. euvesicatoria / X. vesicatoria)",
     "pathogen_type": "bacterium",
+    "pathogen_type_hi": "जीवाणु (बैक्टीरिया)",
     "primary_hosts": ["Tomato (Solanum lycopersicum)"],
     "key_symptoms": [
       "Small, water-soaked, scabby or angular spots on leaves",
       "Lesions on fruit (dark, raised, scabby)",
       "Defoliation and reduced yield under severe pressure"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों पर छोटे, पानी से भीगे, खुरदुरे या कोणीय धब्बे",
+      "फल पर घाव (गहरे, उभरे, खुरदुरे)",
+      "गंभीर दबाव में पत्ती झड़ना और उपज में कमी"
     ],
     "diagnostic_clues": [
       "Water-soaked appearance initially; greasy lesions on fruit",
@@ -160,18 +248,35 @@
       "Rain splash and irrigation",
       "Contaminated seed, transplants, tools"
     ],
+    "transmission_hi": [
+      "बारिश की छींटें और सिंचाई से",
+      "दूषित बीज, पौध और औज़ारों से"
+    ],
     "cultural_controls": [
       "Use disease-free seed and transplants",
       "Avoid overhead irrigation; remove infected debris",
       "Sanitize tools and limit plant-to-plant contact"
     ],
+    "cultural_controls_hi": [
+      "रोग-मुक्त बीज और पौध का उपयोग करें",
+      "ऊपर से सिंचाई से बचें; संक्रमित अवशेष हटाएं",
+      "औज़ार साफ़ रखें और पौधों के बीच संपर्क कम करें"
+    ],
     "chemical_controls_examples": [
       "Copper bactericides (protectant)",
       "Integrated program to reduce resistance risk"
     ],
+    "chemical_controls_examples_hi": [
+      "ताम्बे पर आधारित जीवाणुनाशक (सुरक्षात्मक)",
+      "प्रतिरोध जोखिम कम करने के लिए एकीकृत कार्यक्रम"
+    ],
     "prevention": [
       "Certified clean seed; resistant/tolerant varieties if available",
       "Reduce leaf wetness duration"
+    ],
+    "prevention_hi": [
+      "प्रमाणित साफ़ बीज; उपलब्ध होने पर प्रतिरोधी/सहनशील किस्में",
+      "पत्ती गीलेपन की अवधि कम करें"
     ],
     "recommended_references": [
       "PlantVillage / university extensions"
@@ -180,13 +285,20 @@
 
   "Tomato___Early_blight": {
     "common_name": "Early blight (tomato)",
+    "common_name_hi": "अगेती झुलसा (टमाटर)",
     "scientific_name": "Alternaria solani",
     "pathogen_type": "fungus",
+    "pathogen_type_hi": "फफूंद (कवक)",
     "primary_hosts": ["Tomato", "Potato (also host)"],
     "key_symptoms": [
       "Dark lesions with concentric rings on lower older leaves (target spot)",
       "Defoliation starting from the bottom upward",
       "Lesions may appear on stems and fruit in heavy infections"
+    ],
+    "key_symptoms_hi": [
+      "निचली पुरानी पत्तियों पर संकेंद्रित वलयों वाले गहरे धब्बे (निशाने जैसे)",
+      "नीचे से ऊपर की ओर पत्ती झड़ना",
+      "गंभीर संक्रमण में तनों और फलों पर भी धब्बे दिख सकते हैं"
     ],
     "diagnostic_clues": [
       "Classic concentric ring pattern inside lesions",
@@ -195,15 +307,28 @@
     "transmission": [
       "Spores survive in crop residue; spread by wind and splash"
     ],
+    "transmission_hi": [
+      "बीजाणु फसल अवशेषों में जीवित रहते हैं; हवा और छींटों से फैलते हैं"
+    ],
     "cultural_controls": [
       "Rotate crops and remove/bury crop debris",
       "Avoid excess nitrogen; use proper spacing for airflow"
     ],
+    "cultural_controls_hi": [
+      "फसल चक्र अपनाएं और फसल अवशेष हटाएं/दबाएं",
+      "अधिक नाइट्रोजन से बचें; हवा के प्रवाह के लिए उचित दूरी रखें"
+    ],
     "chemical_controls_examples": [
       "Protectant fungicides (chlorothalonil) and systemic fungicides in rotation"
     ],
+    "chemical_controls_examples_hi": [
+      "सुरक्षात्मक फफूंदनाशक (क्लोरोथैलोनिल) और प्रणालीगत फफूंदनाशक बारी-बारी से"
+    ],
     "prevention": [
       "Resistant varieties when available; sanitation and rotation"
+    ],
+    "prevention_hi": [
+      "उपलब्ध होने पर प्रतिरोधी किस्में; स्वच्छता और फसल चक्र"
     ],
     "recommended_references": [
       "Plant pathology extension sources"
@@ -212,13 +337,20 @@
 
   "Tomato___Late_blight": {
     "common_name": "Late blight (tomato)",
+    "common_name_hi": "पछेती झुलसा (टमाटर)",
     "scientific_name": "Phytophthora infestans",
     "pathogen_type": "oomycete (water mold)",
+    "pathogen_type_hi": "ऊमाइसीट (जल फफूंद)",
     "primary_hosts": ["Tomato", "Potato"],
     "key_symptoms": [
       "Water-soaked, dark lesions on leaves and stems; rapid collapse",
       "White-gray sporulation present on lesion margins in humid conditions",
       "Fruit may show firm, greasy lesions; rapid spread under cool-wet weather"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों और तनों पर पानी से भीगे, गहरे धब्बे; तेज़ी से गिरना",
+      "नम मौसम में धब्बों के किनारों पर सफ़ेद-भूरे बीजाणु",
+      "फलों पर सख़्त, चिकने धब्बे; ठंडे-नम मौसम में तेज़ी से फैलाव"
     ],
     "diagnostic_clues": [
       "Rapid progression, white sporulation on underside in humid weather",
@@ -227,15 +359,28 @@
     "transmission": [
       "Windborne sporangia; infected seed or volunteer plants"
     ],
+    "transmission_hi": [
+      "हवा से उड़ने वाले बीजाणु; संक्रमित बीज या स्वयंसेवी पौधे"
+    ],
     "cultural_controls": [
       "Use certified seed, remove infected plants, improve airflow",
       "Avoid planting near infected fields or volunteer potatoes"
     ],
+    "cultural_controls_hi": [
+      "प्रमाणित बीज का उपयोग करें, संक्रमित पौधे हटाएं, हवा का प्रवाह सुधारें",
+      "संक्रमित खेतों या स्वयंसेवी आलू पौधों के पास न लगाएं"
+    ],
     "chemical_controls_examples": [
       "Oomycete-targeting fungicides (e.g., mefenoxam/metalaxyl historically; phosphonates/phosphites; other recommended actives) used per local guidance"
     ],
+    "chemical_controls_examples_hi": [
+      "ऊमाइसीट-निर्देशित फफूंदनाशक (जैसे, मेफेनोक्सैम/मेटालैक्सिल; फॉस्फोनेट/फॉस्फाइट; अन्य अनुशंसित दवाएं) स्थानीय मार्गदर्शन के अनुसार"
+    ],
     "prevention": [
       "Rapid detection and removal, resistant varieties where available"
+    ],
+    "prevention_hi": [
+      "शीघ्र पहचान और हटाना, जहाँ उपलब्ध हो प्रतिरोधी किस्में"
     ],
     "recommended_references": [
       "PlantVillage, university extension pages (NC State, etc.)"
@@ -244,13 +389,20 @@
 
   "Tomato___Leaf_Mold": {
     "common_name": "Tomato leaf mold",
+    "common_name_hi": "टमाटर पत्ती फफूंद",
     "scientific_name": "Fulvia fulva (syn. Cladosporium fulvum)",
     "pathogen_type": "fungus",
+    "pathogen_type_hi": "फफूंद (कवक)",
     "primary_hosts": ["Tomato (Solanum lycopersicum)"],
     "key_symptoms": [
       "Olive-green to brown velvety spots on underside of leaves",
       "Yellowing of upper leaf surface opposite the moldy underside spots",
       "Defoliation in severe cases"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों के निचले हिस्से पर जैतून-हरे से भूरे मखमली धब्बे",
+      "फफूंद वाले निचले धब्बों के विपरीत ऊपरी पत्ती सतह का पीलापन",
+      "गंभीर मामलों में पत्तियों का झड़ना"
     ],
     "diagnostic_clues": [
       "Velvety olive to brown sporulation on the underside of leaves",
@@ -259,15 +411,28 @@
     "transmission": [
       "Conidia spread via air, water, or contaminated transplants"
     ],
+    "transmission_hi": [
+      "बीजाणु हवा, पानी या दूषित पौध के माध्यम से फैलते हैं"
+    ],
     "cultural_controls": [
       "Improve ventilation and spacing; avoid overhead watering",
       "Remove infected leaves and debris; use resistant varieties if available"
     ],
+    "cultural_controls_hi": [
+      "हवादारपन और दूरी बढ़ाएं; ऊपर से पानी देने से बचें",
+      "संक्रमित पत्तियाँ और अवशेष हटाएं; उपलब्ध होने पर प्रतिरोधी किस्में उपयोग करें"
+    ],
     "chemical_controls_examples": [
       "Fungicide protectants and appropriate systemic fungicides as recommended locally"
     ],
+    "chemical_controls_examples_hi": [
+      "सुरक्षात्मक फफूंदनाशक और स्थानीय रूप से अनुशंसित उचित प्रणालीगत फफूंदनाशक"
+    ],
     "prevention": [
       "Sanitation and good greenhouse/housing practices; choose clean transplants"
+    ],
+    "prevention_hi": [
+      "स्वच्छता और अच्छी ग्रीनहाउस/आवास प्रथाएं; साफ़ पौध चुनें"
     ],
     "recommended_references": [
       "Plant pathology extension resources"
@@ -276,13 +441,20 @@
 
   "Tomato___Mosaic_Virus": {
     "common_name": "Tomato mosaic / mosaic viruses",
+    "common_name_hi": "टमाटर मोज़ेक / मोज़ेक वायरस",
     "scientific_name": "Mosaic viruses (e.g., Tobacco mosaic virus (TMV), Tomato mosaic virus (ToMV))",
     "pathogen_type": "virus",
+    "pathogen_type_hi": "विषाणु (वायरस)",
     "primary_hosts": ["Tomato, many solanaceous species and other hosts (virus-dependent)"],
     "key_symptoms": [
       "Mottled light-and-dark green mosaic pattern on leaves",
       "Leaf distortion, stunting, smaller fruit",
       "Symptoms depend on virus strain and host"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों पर हल्के और गहरे हरे रंग का चितकबरा मोज़ेक पैटर्न",
+      "पत्तियों का विकृत होना, बौनापन, छोटे फल",
+      "लक्षण वायरस के प्रकार और पौधे पर निर्भर करते हैं"
     ],
     "diagnostic_clues": [
       "Characteristic mosaic pattern; often uneven growth",
@@ -291,15 +463,25 @@
     "transmission": [
       "Mechanically via sap on hands, tools, handling; some viruses seed-borne or vectored by insects depending on virus"
     ],
+    "transmission_hi": [
+      "हाथों, औज़ारों और छूने से रस के माध्यम से; कुछ वायरस बीज से या कीटों द्वारा फैलते हैं"
+    ],
     "cultural_controls": [
       "Use virus-free seed and transplants; sanitation of tools and hands",
       "Remove infected plants promptly to reduce spread"
+    ],
+    "cultural_controls_hi": [
+      "वायरस-मुक्त बीज और पौध का उपयोग करें; औज़ारों और हाथों की सफाई",
+      "फैलाव कम करने के लिए संक्रमित पौधों को तुरंत हटाएं"
     ],
     "biological_controls": [
       "No chemical cures for plant viruses; focus on prevention and vector control"
     ],
     "prevention": [
       "Certified clean seed, resistant varieties (if available), strict sanitation"
+    ],
+    "prevention_hi": [
+      "प्रमाणित साफ़ बीज, प्रतिरोधी किस्में (यदि उपलब्ध हो), सख़्त स्वच्छता"
     ],
     "recommended_references": [
       "PlantVillage; university extension diagnostics"
@@ -308,13 +490,20 @@
 
   "Tomato___Septoria_leaf_spot": {
     "common_name": "Septoria leaf spot (tomato)",
+    "common_name_hi": "सेप्टोरिया पत्ती धब्बा (टमाटर)",
     "scientific_name": "Septoria lycopersici",
     "pathogen_type": "fungus",
+    "pathogen_type_hi": "फफूंद (कवक)",
     "primary_hosts": ["Tomato"],
     "key_symptoms": [
       "Many small, circular lesions with dark borders and pale centers on lower leaves",
       "Heavy defoliation of lower canopy under wet conditions",
       "Typically begins on older leaves"
+    ],
+    "key_symptoms_hi": [
+      "निचली पत्तियों पर गहरे किनारों और हल्के बीच वाले कई छोटे, गोल धब्बे",
+      "गीले मौसम में निचली छतरी की भारी पत्ती झड़ना",
+      "आमतौर पर पुरानी पत्तियों से शुरू होता है"
     ],
     "diagnostic_clues": [
       "Small roughly circular spots often with tiny black fruiting bodies visible with magnification",
@@ -323,15 +512,28 @@
     "transmission": [
       "Fungal spores splash-dispersed from infected debris; survives in residue"
     ],
+    "transmission_hi": [
+      "फफूंद बीजाणु संक्रमित अवशेषों से छींटों द्वारा फैलते हैं; अवशेषों में जीवित रहते हैं"
+    ],
     "cultural_controls": [
       "Remove crop residue, rotate crops, increase spacing for airflow",
       "Avoid overhead irrigation; mulch soil to reduce splash"
     ],
+    "cultural_controls_hi": [
+      "फसल अवशेष हटाएं, फसल चक्र अपनाएं, हवा के प्रवाह के लिए दूरी बढ़ाएं",
+      "ऊपर से सिंचाई से बचें; छींटे कम करने के लिए मिट्टी पर मल्च करें"
+    ],
     "chemical_controls_examples": [
       "Protectant fungicides (chlorothalonil, mancozeb) and appropriate systemic actives rotated to prevent resistance"
     ],
+    "chemical_controls_examples_hi": [
+      "सुरक्षात्मक फफूंदनाशक (क्लोरोथैलोनिल, मैंकोज़ेब) और प्रतिरोध रोकने के लिए बारी-बारी से उचित प्रणालीगत दवाएं"
+    ],
     "prevention": [
       "Sanitation and reducing leaf wetness; resistant varieties where available"
+    ],
+    "prevention_hi": [
+      "स्वच्छता और पत्ती गीलापन कम करना; जहाँ उपलब्ध हो प्रतिरोधी किस्में"
     ],
     "recommended_references": [
       "Plant pathology extension pages"
@@ -340,13 +542,20 @@
 
   "Tomato___Spider_mites": {
     "common_name": "Two-spotted spider mite (spider mites)",
+    "common_name_hi": "दो-धब्बेदार मकड़ी का कण (स्पाइडर माइट)",
     "scientific_name": "Tetranychus urticae (two-spotted spider mite)",
     "pathogen_type": "arthropod pest (mite)",
+    "pathogen_type_hi": "कीट (माइट/मकड़ी कण)",
     "primary_hosts": ["Tomato and many other crops"],
     "key_symptoms": [
       "Fine stippling/speckling on leaves (chlorotic points)",
       "Webbing on heavily infested plants; bronzing of foliage",
       "Reduced vigor and yield if heavy infestation"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों पर बारीक़ बिंदुदार धब्बे (पीले बिंदु)",
+      "भारी प्रकोप वाले पौधों पर जाले; पत्तियों का कांस्य रंग होना",
+      "भारी प्रकोप में पौधे की ताक़त और उपज में कमी"
     ],
     "diagnostic_clues": [
       "Tiny mites visible with hand lens and fine webbing in advanced infestations",
@@ -355,15 +564,28 @@
     "transmission": [
       "Mites move by crawling or carried on wind, equipment, transplants"
     ],
+    "transmission_hi": [
+      "माइट रेंगकर या हवा, उपकरणों, पौध के ज़रिए फैलते हैं"
+    ],
     "cultural_controls": [
       "Maintain adequate irrigation (reduces stress that favors mites), encourage natural predators (predatory mites, ladybugs)",
       "Avoid unnecessary broad-spectrum insecticides that kill beneficial predators"
     ],
+    "cultural_controls_hi": [
+      "पर्याप्त सिंचाई बनाए रखें (माइट के अनुकूल तनाव कम होता है), प्राकृतिक शिकारियों को प्रोत्साहित करें (शिकारी माइट, लेडीबग)",
+      "फ़ायदेमंद शिकारियों को मारने वाले अनावश्यक व्यापक-स्पेक्ट्रम कीटनाशकों से बचें"
+    ],
     "chemical_controls_examples": [
       "Miticides (use selective products and follow resistance management guidance)"
     ],
+    "chemical_controls_examples_hi": [
+      "माइटनाशक (चयनात्मक उत्पाद उपयोग करें और प्रतिरोध प्रबंधन मार्गदर्शन का पालन करें)"
+    ],
     "prevention": [
       "Monitor with sticky cards and plant inspections; encourage biological controls"
+    ],
+    "prevention_hi": [
+      "चिपचिपे कार्ड और पौधों के निरीक्षण से निगरानी करें; जैविक नियंत्रण को प्रोत्साहित करें"
     ],
     "recommended_references": [
       "Integrated pest management extension pages"
@@ -372,12 +594,18 @@
 
   "Tomato___Target_Spot": {
     "common_name": "Target spot (tomato)",
+    "common_name_hi": "लक्ष्य धब्बा (टमाटर)",
     "scientific_name": "Corynespora cassiicola (commonly implicated)",
     "pathogen_type": "fungus (or fungal-like)",
+    "pathogen_type_hi": "फफूंद (कवक या कवक-जैसा)",
     "primary_hosts": ["Tomato and many other plants (some strains are host-specific)"],
     "key_symptoms": [
       "Circular to irregular lesions with concentric rings (target-like) on leaves",
       "Leaf blighting under favorable conditions"
+    ],
+    "key_symptoms_hi": [
+      "पत्तियों पर संकेंद्रित वलयों (निशाने जैसे) के साथ गोल से अनियमित धब्बे",
+      "अनुकूल परिस्थितियों में पत्ती का झुलसना"
     ],
     "diagnostic_clues": [
       "Target-like concentric lesion patterns; check host and local disease reports"
@@ -385,15 +613,28 @@
     "transmission": [
       "Windborne spores and splash; survives in crop residues"
     ],
+    "transmission_hi": [
+      "हवा से उड़ने वाले बीजाणु और छींटे; फसल अवशेषों में जीवित रहते हैं"
+    ],
     "cultural_controls": [
       "Crop sanitation and residue removal; rotate hosts",
       "Avoid overhead irrigation and reduce leaf wetness"
     ],
+    "cultural_controls_hi": [
+      "फसल स्वच्छता और अवशेष हटाना; फसल चक्र अपनाएं",
+      "ऊपर से सिंचाई से बचें और पत्ती का गीलापन कम करें"
+    ],
     "chemical_controls_examples": [
       "Fungicide protectants and appropriate systemic fungicides where recommended"
     ],
+    "chemical_controls_examples_hi": [
+      "सुरक्षात्मक फफूंदनाशक और जहाँ अनुशंसित हो उचित प्रणालीगत फफूंदनाशक"
+    ],
     "prevention": [
       "Sanitation; use clean transplants"
+    ],
+    "prevention_hi": [
+      "स्वच्छता; साफ़ पौध का उपयोग करें"
     ],
     "recommended_references": [
       "Plant pathology and university extension resources"
@@ -402,12 +643,18 @@
 
   "Tomato___YellowLeaf_Curl_Virus": {
     "common_name": "Tomato yellow leaf curl virus (TYLCV)",
+    "common_name_hi": "टमाटर पीला पत्ता मोड़ विषाणु (TYLCV)",
     "scientific_name": "Tomato yellow leaf curl virus (TYLCV) — a begomovirus",
     "pathogen_type": "virus",
+    "pathogen_type_hi": "विषाणु (वायरस)",
     "primary_hosts": ["Tomato and some solanaceous species"],
     "key_symptoms": [
       "Severe leaf yellowing and upward curling of new leaves",
       "Stunted plants and reduced yield; small, distorted fruit"
+    ],
+    "key_symptoms_hi": [
+      "नई पत्तियों का गंभीर पीलापन और ऊपर की ओर मुड़ना",
+      "बौने पौधे और कम उपज; छोटे, विकृत फल"
     ],
     "diagnostic_clues": [
       "Rapid onset of curling and yellowing on new growth; presence of whiteflies on plant",
@@ -417,9 +664,17 @@
       "Transmitted by the whitefly (Bemisia tabaci) in a persistent manner",
       "Can be introduced on infected seedlings"
     ],
+    "transmission_hi": [
+      "सफ़ेद मक्खी (बेमिसिया टबैसी) द्वारा लगातार तरीक़े से फैलता है",
+      "संक्रमित पौध से भी आ सकता है"
+    ],
     "cultural_controls": [
       "Control whitefly populations (screens, insect-proof greenhouses, reflective mulches), remove infected plants",
       "Use virus-free seedlings and resistant varieties when available"
+    ],
+    "cultural_controls_hi": [
+      "सफ़ेद मक्खी की आबादी नियंत्रित करें (जालियाँ, कीट-रोधी ग्रीनहाउस, परावर्तक मल्च), संक्रमित पौधे हटाएं",
+      "वायरस-मुक्त पौध और उपलब्ध होने पर प्रतिरोधी किस्मों का उपयोग करें"
     ],
     "biological_controls": [
       "Conservation of natural enemies of whiteflies can help reduce vector pressure"
@@ -427,8 +682,14 @@
     "chemical_controls_examples": [
       "Insecticidal control of whiteflies (use IPM principles; rotate modes of action to limit resistance)"
     ],
+    "chemical_controls_examples_hi": [
+      "सफ़ेद मक्खी का कीटनाशक नियंत्रण (IPM सिद्धांत अपनाएं; प्रतिरोध सीमित करने के लिए दवाओं की विधि बदलते रहें)"
+    ],
     "prevention": [
       "Use resistant varieties where available; implement vector management and sanitation"
+    ],
+    "prevention_hi": [
+      "जहाँ उपलब्ध हो प्रतिरोधी किस्मों का उपयोग करें; कीट प्रबंधन और स्वच्छता लागू करें"
     ],
     "recommended_references": [
       "PlantVillage and extension publications on TYLCV and whitefly management"
@@ -437,10 +698,13 @@
 
   "Tomato___healthy": {
     "common_name": "Healthy tomato",
+    "common_name_hi": "स्वस्थ टमाटर",
     "scientific_name": null,
     "pathogen_type": "healthy",
+    "pathogen_type_hi": "स्वस्थ",
     "primary_hosts": ["Solanum lycopersicum"],
     "key_symptoms": ["No visible disease; normal leaf shape, color and fruit development"],
+    "key_symptoms_hi": ["कोई दिखने वाला रोग नहीं; पत्ती का आकार, रंग और फल विकास सामान्य"],
     "management": ["Maintain sanitation, monitoring, and use certified seed/transplants"]
   }
 }
