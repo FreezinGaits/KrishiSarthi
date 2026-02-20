@@ -98,3 +98,43 @@
   font-size: 0.9rem;
   text-align: center;
 }
+
+/* ── Camera + Gallery action buttons ── */
+.upload-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.upload-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.upload-action-btn:hover {
+  border-color: var(--green-400);
+  background: rgba(34,197,94,0.06);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(34,197,94,0.08);
+}
+
+.camera-btn:hover {
+  border-color: #3b82f6;
+  background: rgba(59,130,246,0.06);
+  box-shadow: 0 3px 10px rgba(59,130,246,0.08);
+}
+

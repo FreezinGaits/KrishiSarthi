@@ -15,8 +15,53 @@
   border-radius:6px;
   cursor:pointer;
 }
-.answer-length { margin-right:12px; font-size:14px; color: var(--text-dim); }
-.chat-upload { background:transparent; border:none; font-size:20px; margin-right:6px; cursor:pointer; }
+
+/* ── Answer Length Pills ── */
+.answer-length-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.length-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-right: 2px;
+  white-space: nowrap;
+}
+.length-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.length-pill:hover {
+  border-color: var(--green-400);
+  color: var(--text);
+  background: rgba(34,197,94,0.04);
+}
+.length-pill.active {
+  background: rgba(34,197,94,0.12);
+  border-color: var(--green-500);
+  color: var(--green-600);
+  font-weight: 600;
+  box-shadow: 0 0 8px rgba(34,197,94,0.10);
+}
+[data-theme="dark"] .length-pill.active {
+  color: var(--green-400);
+  background: rgba(34,197,94,0.15);
+}
+.pill-icon { font-size: 0.85rem; }
+.pill-label { line-height: 1; }
 
 .chat-container {
   display: flex;
@@ -79,6 +124,53 @@
   word-break: break-word;
 }
 
+/* ── Chat image preview (inline in messages) ── */
+.chat-img-preview {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: block;
+  border: 1px solid var(--border);
+  object-fit: cover;
+}
+
+/* ── Pending image attachment bar ── */
+.pending-image-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  color: var(--green-600);
+  background: rgba(34,197,94,0.04);
+  border-top: 1px solid rgba(34,197,94,0.15);
+}
+[data-theme="dark"] .pending-image-bar { color: var(--green-400); }
+.pending-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pending-remove {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+.pending-remove:hover {
+  color: #ef4444;
+  background: rgba(239,68,68,0.08);
+}
+
 /* ── Typing indicator ── */
 .typing-indicator {
   display: flex;
@@ -112,12 +204,8 @@
   border-radius: 8px;
   color: var(--text-dim);
   cursor: pointer;
-  opacity: 0;
-  transition: all var(--transition);
-}
-
-.chat-msg.assistant:hover .tts-btn {
   opacity: 1;
+  transition: all var(--transition);
 }
 
 .tts-btn:hover {
@@ -145,12 +233,13 @@
 /* ── Input bar ── */
 .chat-input-bar {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   padding: 14px 20px;
   border-top: 1px solid var(--border);
   background: var(--bg-nav);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  align-items: center;
 }
 .chat-input {
   flex: 1;
@@ -170,6 +259,28 @@
 .chat-input::placeholder {
   color: var(--text-muted);
 }
+
+/* ── Gallery & Camera action buttons ── */
+.chat-action-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.chat-action-btn:hover {
+  background: rgba(34,197,94,0.08);
+  border-color: var(--green-400);
+  transform: scale(1.08);
+}
+
 .chat-send {
   width: 46px;
   height: 46px;
@@ -182,6 +293,7 @@
   font-size: 1.2rem;
   transition: all var(--transition);
   box-shadow: 0 0 16px rgba(34,197,94,0.2);
+  flex-shrink: 0;
 }
 .chat-send:hover:not(:disabled) {
   transform: scale(1.05);
@@ -196,3 +308,4 @@
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+

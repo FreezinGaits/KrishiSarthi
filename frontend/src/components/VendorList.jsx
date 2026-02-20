@@ -1,6 +1,6 @@
 import './VendorList.css'
 
-export default function VendorList({ vendors = [], status = 'idle', matchedDisease = null }) {
+export default function VendorList({ vendors = [], status = 'idle', matchedDisease = null, onChatVendor }) {
   if (status === 'loading') {
     return (
       <div className="vendor-empty">
@@ -67,8 +67,19 @@ export default function VendorList({ vendors = [], status = 'idle', matchedDisea
               </div>
             </div>
           )}
+          {/* ── Chat with Vendor ── */}
+          <div className="vendor-actions">
+            <button
+              className="vendor-chat-btn"
+              onClick={() => onChatVendor?.(v)}
+              title={`Chat with ${v.name}`}
+            >
+              💬 Chat with Vendor
+            </button>
+          </div>
         </div>
       ))}
     </div>
   )
 }
+

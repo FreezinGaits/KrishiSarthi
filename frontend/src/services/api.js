@@ -73,3 +73,65 @@ export async function deleteSession(sessionId) {
 export async function getHealth() {
   return request('/health');
 }
+
+// ══════════════════════════════════════════════════
+//  Marketplace API
+// ══════════════════════════════════════════════════
+
+const MARKET_BASE = '/marketplace';
+
+async function marketRequest(url, options = {}) {
+  const headers = { ...options.headers };
+  try {
+    const res = await fetch(`${MARKET_BASE}${url}`, { ...options, headers });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (e) {
+    console.error(`Marketplace API error [${url}]:`, e);
+    throw e;
+  }
+}
+
+export async function startConversation(farmerId, vendorId) {
+  return marketRequest('/chat/start', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ farmer_id: farmerId, vendor_id: vendorId }),
+  });
+}
+
+export async function sendMarketMessage(conversationId, senderId, message) {
+  return marketRequest('/chat/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ conversation_id: conversationId, sender_id: senderId, message }),
+  });
+}
+
+export async function getConversationMessages(conversationId) {
+  return marketRequest(`/chat/${conversationId}`);
+}
+
+export async function createMedicineRequest(farmerId, vendorId, diseaseName, medicineName) {
+  return marketRequest('/medicine/request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      farmer_id: farmerId,
+      vendor_id: vendorId,
+      disease_name: diseaseName,
+      medicine_name: medicineName,
+    }),
+  });
+}
+
+export async function respondToMedicineRequest(requestId, status) {
+  return marketRequest('/medicine/respond', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ request_id: requestId, status }),
+  });
+}

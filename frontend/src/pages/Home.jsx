@@ -182,7 +182,7 @@ export default function Home() {
       </section>
 
       <footer className="home-footer">
-        <p>Smart India Hackathon के लिए बनाया गया · कृषि-सारथी / Krishi-Sarthi © 2026</p>
+        <p>Next Quantum 3.0 Hackathon के लिए बनाया गया · कृषि-सारथी / Krishi-Sarthi © 2026</p>
       </footer>
     </div>
   )

@@ -24,6 +24,7 @@ const ChatInterface = forwardRef(function ChatInterface(
   const [answerLength, setAnswerLength] = useState('medium')
   const bottomRef = useRef()
   const fileRef = useRef()
+  const cameraRef = useRef()
   const [pendingImage, setPendingImage] = useState(null)
   const [pendingPreview, setPendingPreview] = useState(null)
   const [speakingId, setSpeakingId] = useState(null)
@@ -94,11 +95,22 @@ const ChatInterface = forwardRef(function ChatInterface(
     onAddMessage('user', msg)
     setLoading(true)
 
+    // Capture and clear pending image so follow-up messages don't re-send it
+    const imageToSend = pendingImage
+    setPendingImage(null)
+    setPendingPreview(null)
+
+    console.log('[ChatInterface] doSend:', {
+      msg: msg.substring(0, 60),
+      hasImage: !!imageToSend,
+      imageLen: imageToSend?.length || 0,
+    })
+
     try {
       const res = await chatWithAgent(
         msg,
         sessionId,
-        pendingImage,
+        imageToSend,
         location?.lat,
         location?.lng,
         'hi',
@@ -122,6 +134,7 @@ const ChatInterface = forwardRef(function ChatInterface(
   }
 
   function openFilePicker() { fileRef.current?.click() }
+  function openCamera() { cameraRef.current?.click() }
 
   async function handleFileInput(e) {
     const file = e.target.files?.[0]
@@ -132,18 +145,22 @@ const ChatInterface = forwardRef(function ChatInterface(
 
   async function sendImageInChat(file) {
     try {
-      const b64 = await new Promise((res, rej) => {
+      // Read as data URL (base64) — this survives localStorage unlike blob URLs
+      const dataUrl = await new Promise((res, rej) => {
         const reader = new FileReader()
-        reader.onload = () => res(reader.result.split(',')[1])
+        reader.onload = () => res(reader.result)
         reader.onerror = rej
         reader.readAsDataURL(file)
       })
 
-      const previewUrl = URL.createObjectURL(file)
-      setPendingImage(b64)
-      setPendingPreview(previewUrl)
+      // Extract raw base64 (without the data:image/...;base64, prefix)
+      const b64 = dataUrl.split(',')[1]
 
-      onAddMessage('user', '📷 Image uploaded', { image_preview: previewUrl })
+      setPendingImage(b64)
+      setPendingPreview(dataUrl)
+
+      // Store the full data URL (not blob URL) so it persists in localStorage
+      onAddMessage('user', '📷 Image uploaded', { image_preview: dataUrl })
       onAddMessage('assistant', 'Image received 🌿\nWhat would you like to know about this crop?')
     } catch (e) {
       console.error(e)
@@ -159,14 +176,24 @@ const ChatInterface = forwardRef(function ChatInterface(
           {/* New Chat button removed — now handled by sidebar */}
         </div>
         <div className="chat-controls-right">
-          <label className="answer-length">
-            Length:
-            <select value={answerLength} onChange={(e) => setAnswerLength(e.target.value)}>
-              <option value="short">Short</option>
-              <option value="medium">Medium</option>
-              <option value="long">Long</option>
-            </select>
-          </label>
+          <div className="answer-length-pills">
+            <span className="length-label">उत्तर / Answer:</span>
+            {[
+              { key: 'short', label: 'Short', hindi: 'संक्षिप्त', icon: '⚡' },
+              { key: 'medium', label: 'Medium', hindi: 'मध्यम', icon: '📝' },
+              { key: 'long', label: 'Detailed', hindi: 'विस्तृत', icon: '📖' },
+            ].map((opt) => (
+              <button
+                key={opt.key}
+                className={`length-pill ${answerLength === opt.key ? 'active' : ''}`}
+                onClick={() => setAnswerLength(opt.key)}
+                title={opt.hindi}
+              >
+                <span className="pill-icon">{opt.icon}</span>
+                <span className="pill-label">{opt.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -179,8 +206,8 @@ const ChatInterface = forwardRef(function ChatInterface(
                 {m.image_preview && (
                   <img
                     src={m.image_preview}
-                    alt="preview"
-                    style={{ maxWidth: 220, borderRadius: 6, marginBottom: 6 }}
+                    alt="crop photo"
+                    className="chat-img-preview"
                   />
                 )}
                 {m.text}
@@ -214,8 +241,14 @@ const ChatInterface = forwardRef(function ChatInterface(
       </div>
 
       {pendingPreview && (
-        <div style={{ padding: 8, fontSize: 14, color: '#4caf50' }}>
-          📷 Image attached — will be sent with your next message
+        <div className="pending-image-bar">
+          <img src={pendingPreview} alt="attached" className="pending-thumb" />
+          <span>📷 Image attached — will be sent with your next message</span>
+          <button
+            className="pending-remove"
+            onClick={() => { setPendingImage(null); setPendingPreview(null) }}
+            title="Remove"
+          >✕</button>
         </div>
       )}
 
@@ -228,16 +261,27 @@ const ChatInterface = forwardRef(function ChatInterface(
           placeholder="अपना सवाल पूछें... / Ask your question..."
           disabled={loading}
         />
+        {/* Hidden file inputs */}
         <input
           ref={fileRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileInput}
+          hidden
+        />
+        <input
+          ref={cameraRef}
           type="file"
           accept="image/*"
           capture="environment"
           onChange={handleFileInput}
           hidden
         />
-        <button type="button" className="chat-upload" onClick={openFilePicker} title="Upload photo">
-          📷
+        <button type="button" className="chat-action-btn" onClick={openFilePicker} title="Upload from gallery / गैलरी से अपलोड">
+          🖼️
+        </button>
+        <button type="button" className="chat-action-btn" onClick={openCamera} title="Take photo / फ़ोटो लें">
+          📸
         </button>
         <button className="chat-send" type="submit" disabled={loading || !input.trim()}>
           ➤
@@ -248,3 +292,4 @@ const ChatInterface = forwardRef(function ChatInterface(
 })
 
 export default ChatInterface
+

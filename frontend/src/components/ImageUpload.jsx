@@ -9,6 +9,7 @@ export default function ImageUpload({ onDiagnosis }) {
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const fileRef = useRef()
+  const cameraRef = useRef()
 
   function handleFile(e) {
     const file = e.target.files?.[0]
@@ -69,8 +70,34 @@ export default function ImageUpload({ onDiagnosis }) {
         )}
       </div>
 
+      {/* ── Action buttons: Camera + Gallery ── */}
+      <div className="upload-actions">
+        <button
+          type="button"
+          className="upload-action-btn camera-btn"
+          onClick={() => cameraRef.current?.click()}
+        >
+          📸 <span>Camera / कैमरा</span>
+        </button>
+        <button
+          type="button"
+          className="upload-action-btn gallery-btn"
+          onClick={() => fileRef.current?.click()}
+        >
+          🖼️ <span>Gallery / गैलरी</span>
+        </button>
+      </div>
+
+      {/* Hidden file inputs */}
       <input
         ref={fileRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFile}
+        hidden
+      />
+      <input
+        ref={cameraRef}
         type="file"
         accept="image/*"
         capture="environment"
@@ -83,3 +110,4 @@ export default function ImageUpload({ onDiagnosis }) {
     </div>
   )
 }
+

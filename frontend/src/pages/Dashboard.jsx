@@ -8,6 +8,7 @@ import VoiceRecorder from '../components/VoiceRecorder'
 import ImageUpload from '../components/ImageUpload'
 import DiagnosisCard from '../components/DiagnosisCard'
 import VendorList from '../components/VendorList'
+import VendorChat from '../components/VendorChat'
 import MapView from '../components/MapView'
 import MandiRates from '../components/MandiRates'
 import { DemoButton } from '../components/DemoMode'
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const [matchedDisease, setMatchedDisease] = useState(null)
   const [location, setLocation] = useState(null)
   const [chatInput, setChatInput] = useState('')
+  const [chatVendor, setChatVendor] = useState(null) // vendor currently chatting
   const chatRef = useRef()
 
   // ── Multi-session hook ──
@@ -170,7 +172,14 @@ export default function Dashboard() {
               <h2 className="panel-title">🔬 Diagnosis Results</h2>
               <DemoButton onDiagnosis={handleDiagnosis} sessionId={activeId} location={location} />
               {diagnosis ? (
-                <DiagnosisCard data={diagnosis} />
+              <DiagnosisCard
+                data={diagnosis}
+                onRequestMedicine={(info) => {
+                  console.log('Medicine request sent:', info)
+                  // Optionally switch to vendors tab
+                  setActiveTab('vendors')
+                }}
+              />
               ) : (
                 <div className="empty-state">
                   <span className="empty-icon">🌱</span>
@@ -190,7 +199,12 @@ export default function Dashboard() {
                 </div>
               )}
               <div className="vendors-layout">
-                <VendorList vendors={vendors} status={vendorStatus} matchedDisease={matchedDisease} />
+                <VendorList
+                  vendors={vendors}
+                  status={vendorStatus}
+                  matchedDisease={matchedDisease}
+                  onChatVendor={(v) => setChatVendor(v)}
+                />
                 <MapView vendors={vendors} center={location} />
               </div>
             </div>
@@ -199,6 +213,14 @@ export default function Dashboard() {
           {activeTab === 'market' && <MandiRates />}
         </main>
       </div>
+
+      {/* ── Vendor Chat Modal ── */}
+      {chatVendor && (
+        <VendorChat
+          vendor={chatVendor}
+          onClose={() => setChatVendor(null)}
+        />
+      )}
     </div>
   )
 }

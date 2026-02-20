@@ -1,5 +1,9 @@
 import { useState, useRef, useCallback } from 'react'
+import { createMedicineRequest } from '../services/api'
 import './DiagnosisCard.css'
+
+const DEMO_FARMER_ID = 'demo-farmer-001'
+const DEMO_VENDOR_ID = 'demo-vendor-001'
 
 // ── Speech helper ──
 function speakText(text) {
@@ -50,7 +54,9 @@ function SpeakButton({ text }) {
   )
 }
 
-export default function DiagnosisCard({ data, compact = false }) {
+export default function DiagnosisCard({ data, compact = false, onRequestMedicine }) {
+  const [medReqStatus, setMedReqStatus] = useState({}) // { medicineName: 'idle'|'loading'|'success'|'error' }
+
   if (!data) return null
 
   const disease = data.top_disease || data.disease || ''
@@ -205,6 +211,63 @@ export default function DiagnosisCard({ data, compact = false }) {
               <li key={i}>{p}</li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* ── Check Availability Buttons ── */}
+      {chemicalControls && chemicalControls.length > 0 && (
+        <div className="diag-section diag-availability">
+          <div className="section-header">
+            <h4>🛒 दवाई उपलब्धता जांचें / Check Availability</h4>
+          </div>
+          <div className="avail-btn-list">
+            {chemicalControls.map((med, i) => {
+              const medName = (typeof med === 'string' ? med : String(med)).slice(0, 80)
+              const status = medReqStatus[medName] || 'idle'
+              return (
+                <button
+                  key={i}
+                  className={`avail-btn avail-${status}`}
+                  disabled={status === 'loading' || status === 'success'}
+                  onClick={async () => {
+                    setMedReqStatus(prev => ({ ...prev, [medName]: 'loading' }))
+                    try {
+                      const res = await createMedicineRequest(
+                        DEMO_FARMER_ID,
+                        DEMO_VENDOR_ID,
+                        commonName,
+                        medName
+                      )
+                      setMedReqStatus(prev => ({ ...prev, [medName]: 'success' }))
+                      onRequestMedicine?.({
+                        requestId: res.id,
+                        medicineName: medName,
+                        diseaseName: commonName,
+                      })
+                    } catch {
+                      setMedReqStatus(prev => ({ ...prev, [medName]: 'error' }))
+                    }
+                  }}
+                >
+                  <span className="avail-icon">
+                    {status === 'loading' ? '⏳'
+                      : status === 'success' ? '✅'
+                        : status === 'error' ? '❌'
+                          : '🔍'}
+                  </span>
+                  <span className="avail-text">
+                    {status === 'loading' ? 'Sending…'
+                      : status === 'success' ? 'Sent!'
+                        : status === 'error' ? 'Failed — Retry'
+                          : medName}
+                  </span>
+                  {status === 'idle' && (
+                    <span className="avail-sub">उपलब्धता जांचें</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>
