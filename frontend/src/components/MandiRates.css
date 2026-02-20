@@ -1,0 +1,265 @@
+/* ═══  Mandi Rates  ═══ */
+
+.mandi-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.mandi-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.mandi-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--green-300);
+  margin-bottom: 4px;
+}
+.mandi-subtitle {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+}
+.mandi-clear-btn {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.mandi-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* ── Filters ── */
+.mandi-filters {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  background: rgba(15, 23, 20, 0.65);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 22px;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 160px;
+  flex: 1;
+}
+.search-group { min-width: 200px; flex: 1.5; }
+.filter-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.filter-select,
+.filter-input {
+  padding: 9px 12px;
+  background: rgba(10, 15, 13, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.filter-select:focus,
+.filter-input:focus {
+  border-color: var(--green-500);
+}
+.filter-select option {
+  background: #0a0f0d;
+  color: #e5e7eb;
+}
+
+/* ── Summary Cards ── */
+.mandi-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.stat-card {
+  padding: 18px 16px;
+  background: rgba(15, 23, 20, 0.55);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  transition: all var(--transition);
+}
+.stat-card:hover {
+  background: rgba(15, 23, 20, 0.75);
+  border-color: var(--border-hi);
+  transform: translateY(-2px);
+}
+.stat-value {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.stat-card.high { border-left: 3px solid #22c55e; }
+.stat-card.high .stat-value { color: #4ade80; }
+.stat-card.low { border-left: 3px solid #ef4444; }
+.stat-card.low .stat-value { color: #f87171; }
+.stat-card.avg { border-left: 3px solid #f59e0b; }
+.stat-card.avg .stat-value { color: #fbbf24; }
+
+/* ── Table ── */
+.mandi-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(15, 23, 20, 0.45);
+}
+.mandi-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.mandi-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.mandi-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: rgba(10, 15, 13, 0.9);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+.mandi-table th:hover { color: var(--green-400); }
+.th-price { text-align: right; }
+.sort-icon {
+  font-size: 0.75rem;
+  margin-left: 4px;
+  color: var(--green-400);
+}
+.sort-icon.dim { color: var(--text-muted); opacity: 0.4; }
+
+.mandi-table td {
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background var(--transition);
+}
+.mandi-table tbody tr:hover td {
+  background: rgba(34, 197, 94, 0.04);
+}
+.mandi-table tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.015);
+}
+.mandi-table tbody tr:nth-child(even):hover td {
+  background: rgba(34, 197, 94, 0.05);
+}
+
+/* Market cell */
+.td-market {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.market-name {
+  font-weight: 600;
+  color: var(--text-light);
+}
+.market-state {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Variety badge */
+.variety-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: 20px;
+  color: var(--green-400);
+}
+
+/* Price cells */
+.td-price {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+.td-modal { color: var(--text-light); }
+.price-high { color: #4ade80 !important; }
+.price-low { color: #f87171 !important; }
+.price-mid { color: #fbbf24 !important; }
+
+/* ── Loading / Empty ── */
+.mandi-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 24px;
+  color: var(--text-muted);
+}
+.mandi-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--green-400);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.mandi-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 24px;
+  color: var(--text-muted);
+  text-align: center;
+}
+.mandi-empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .mandi-container { padding: 14px; }
+  .mandi-filters { flex-direction: column; }
+  .mandi-stats { grid-template-columns: repeat(2, 1fr); }
+  .mandi-table th,
+  .mandi-table td { padding: 10px 10px; font-size: 0.82rem; }
+}

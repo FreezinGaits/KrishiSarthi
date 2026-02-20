@@ -1,0 +1,80 @@
+State,District,Market,Variety,Min_Price_Rs_per_Quintal,Max_Price_Rs_per_Quintal,Modal_Price_Rs_per_Quintal
+Punjab,Amritsar,Attari Mandi,Lokwan,2200,2350,2290
+Punjab,Fazilka,Abohar Mandi,Lokwan,2220,2370,2310
+Punjab,Bathinda,Bathinda Mandi,Lokwan,2180,2330,2275
+Uttar Pradesh,Varanasi,Varanasi Mandi,Lokwan,2100,2250,2180
+Uttar Pradesh,Azamgarh,Azamgarh Mandi,Lokwan,2080,2230,2160
+Uttar Pradesh,Prayagraj,Prayagraj Mandi,Lokwan,2120,2270,2195
+Himachal Pradesh,Bilaspur,Bilaspur Mandi,Lokwan,2400,2550,2485
+Himachal Pradesh,Mandi,Mandi Mandi,Lokwan,2420,2570,2505
+Himachal Pradesh,Kangra,Kangra Mandi,Lokwan,2450,2600,2530
+Punjab,Amritsar,Attari Mandi,Lokwan,2150,2300,2225
+Punjab,Ludhiana,Gill Mandi,Lokwan,2200,2350,2280
+Punjab,Bathinda,Bathinda Mandi,Lokwan,2100,2250,2175
+Uttar Pradesh,Azamgarh,Azamgarh Mandi,Lokwan,1950,2100,2025
+Uttar Pradesh,Varanasi,Varanasi Mandi,Lokwan,2000,2150,2075
+Uttar Pradesh,Prayagraj,Prayagraj Mandi,Lokwan,2050,2200,2125
+Himachal Pradesh,Bilaspur,Bilaspur Mandi,Lokwan,1800,1950,1875
+Himachal Pradesh,Kangra,Kangra Mandi,Lokwan,1850,2000,1925
+Himachal Pradesh,Shimla,Shimla Mandi,Lokwan,1900,2050,1975
+Punjab,Amritsar,Attari Mandi,Lokwan,2150,2300,2225
+Punjab,Ludhiana,Chohla Mandi,Lokwan,2200,2350,2280
+Punjab,Bathinda,Lehra Mandi,Lokwan,2100,2250,2180
+Uttar Pradesh,Azamgarh,Mubarakpur Mandi,Kufri,1800,1950,1875
+Uttar Pradesh,Gorakhpur,Piprauli Mandi,Kufri,1850,2000,1925
+Uttar Pradesh,Varanasi,Chunar Mandi,Kufri,1750,1900,1825
+Himachal Pradesh,Bilaspur,Bilaspur Mandi,Kufri,2000,2150,2075
+Himachal Pradesh,Hamirpur,Hamirpur Mandi,Kufri,2050,2200,2125
+Himachal Pradesh,Shimla,Shimla Mandi,Kufri,2100,2250,2175
+Punjab,Amritsar,Attari Mandi,Potato,3200,3500,3350
+Punjab,Ludhiana,Khanna Mandi,Potato,3250,3600,3400
+Punjab,Jalandhar,Phagwara Mandi,Potato,3150,3450,3300
+Himachal Pradesh,Mandi,Mandi Mandi,Potato,2800,3100,2950
+Himachal Pradesh,Shimla,Shimla Mandi,Potato,2850,3150,3000
+Himachal Pradesh,Kangra,Dharamshala Mandi,Potato,2750,3050,2900
+Uttar Pradesh,Agra,Agra Mandi,Potato,2400,2700,2550
+Uttar Pradesh,Varanasi,Varanasi Mandi,Potato,2450,2750,2600
+Uttar Pradesh,Meerut,Meerut Mandi,Potato,2350,2650,2500
+Punjab,Amritsar,Attari Mandi,Wheat,2200,2400,2300
+Punjab,Ludhiana,Gill Mandi,Wheat,2250,2450,2350
+Punjab,Bathinda,Bathinda Grain Market,Wheat,2150,2350,2250
+Himachal Pradesh,Mandi,Mandi Grain Market,Wheat,2000,2200,2100
+Himachal Pradesh,Kangra,Nurpur Grain Market,Wheat,2050,2250,2150
+Uttar Pradesh,Azamgarh,Azamgarh Grain Market,Wheat,1900,2100,2000
+Uttar Pradesh,Varanasi,Varanasi Grain Market,Wheat,1950,2150,2050
+Uttar Pradesh,Prayagraj,Prayagraj Grain Market,Wheat,2000,2200,2100
+
+Punjab,Amritsar,Attari Mandi,Cotton,47000,49000,48000
+Punjab,Bathinda,Bathinda Grain Market,Cotton,46500,48500,47500
+Punjab,Fazilka,Fazilka Grain Market,Cotton,46000,48000,47000
+Uttar Pradesh,Etawah,Etawah Mandi,Cotton,45000,47000,46000
+Uttar Pradesh,Agra,Agra Mandi,Cotton,45500,47500,46500
+Himachal Pradesh,Bilaspur,Bilaspur Mandi,Cotton,48000,50000,49000
+Himachal Pradesh,Mandi,Mandi Mandi,Cotton,47500,49500,48500
+Himachal Pradesh,Kangra,Kangra Mandi,Cotton,47000,49000,48000
+Punjab,Amritsar,Attari Mandi,Mirchi,12000,14000,13000
+Punjab,Bathinda,Bathinda Mandi,Mirchi,11800,13800,12800
+Punjab,Ludhiana,Ludhiana Mandi,Mirchi,12200,14200,13200
+Himachal Pradesh,Bilaspur,Bilaspur Mandi,Mirchi,9000,11000,10000
+Himachal Pradesh,Hamirpur,Hamirpur Mandi,Mirchi,8800,10800,9800
+Himachal Pradesh,Kangra,Kangra Mandi,Mirchi,9200,11200,10200
+Uttar Pradesh,Agra,Agra Mandi,Mirchi,10500,12500,11500
+Uttar Pradesh,Aligarh,Aligarh Mandi,Mirchi,10000,12000,11000
+Uttar Pradesh,Mathura,Mathura Mandi,Mirchi,10800,12800,11800
+Punjab,Amritsar,Attari Mandi,Mirchi,8000,8500,8250
+Punjab,Ludhiana,Chowk Bazaar,Mirchi,8200,8800,8500
+Punjab,Bathinda,Grain Market,Mirchi,7800,8300,8100
+Himachal Pradesh,Shimla,Mandi Sadar Bazaar,Mirchi,8500,9200,8900
+Himachal Pradesh,Kangra,Dharamshala Market,Mirchi,8800,9500,9200
+Himachal Pradesh,Solan,Hatkoti Market,Mirchi,8200,8800,8500
+Uttar Pradesh,Lucknow,Azadpur Mandi,Mirchi,7000,7500,7250
+Uttar Pradesh,Varanasi,Bhulanpur Mandi,Mirchi,7200,7800,7500
+Uttar Pradesh,Meerut,Meerut Mandi,Mirchi,6800,7300,7050
+Punjab,Ludhiana,Chohla Mandi,Onion,1250,1450,1350
+Punjab,Jalandhar,Phillaur Mandi,Onion,1225,1425,1325
+Himachal Pradesh,Bilaspur,Bilaspur Mandi,Onion,1000,1200,1100
+Himachal Pradesh,Kangra,Dharamshala Mandi,Onion,950,1150,1050
+Himachal Pradesh,Mandi,Mandi Mandi,Onion,975,1175,1075
+Uttar Pradesh,Azamgarh,Azamgarh Mandi,Onion,850,1050,950
+Uttar Pradesh,Varanasi,Varanasi Mandi,Onion,875,1075,975
+Uttar Pradesh,Prayagraj,Prayagraj Mandi,Onion,900,1100,1000

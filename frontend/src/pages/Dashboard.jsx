@@ -8,6 +8,7 @@ import ImageUpload from '../components/ImageUpload'
 import DiagnosisCard from '../components/DiagnosisCard'
 import VendorList from '../components/VendorList'
 import MapView from '../components/MapView'
+import MandiRates from '../components/MandiRates'
 import { DemoButton } from '../components/DemoMode'
 import { findVendors } from '../services/api'
 import './Dashboard.css'
@@ -99,6 +100,7 @@ export default function Dashboard() {
             { id: 'camera', icon: '📸', label: 'Scan' },
             { id: 'results', icon: '🔬', label: 'Results' },
             { id: 'vendors', icon: '📍', label: 'Vendors' },
+            { id: 'market', icon: '🏪', label: 'Market' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -187,6 +189,8 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+
+          {activeTab === 'market' && <MandiRates />}
         </main>
       </div>
     </div>

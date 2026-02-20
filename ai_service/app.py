@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import base64
 import os
+import csv
 import tempfile
 import shutil
 import uvicorn
@@ -137,7 +138,7 @@ EXPECTED_API_KEY = "krishi-sarthi-api-key-change-this"
 async def api_key_check(request: Request, call_next):
     path = request.url.path.rstrip("/")
     # Skip health + session endpoints from API key requirement
-    skip = ("/api/health", "/api/sessions")
+    skip = ("/api/health", "/api/sessions", "/api/mandi-rates")
     if path.startswith("/api") and not path.startswith(skip):
         key = request.headers.get("x-api-key") or request.headers.get("X-API-Key")
         if key != EXPECTED_API_KEY:
@@ -247,10 +248,63 @@ class ChatRequest(BaseModel):
     language: Optional[str] = "hi"
     options: Optional[Dict[str, Any]] = {}
 
+# ---------- Mandi Rates CSV Loader ----------
+MANDI_CSV_PATH = os.path.join(BASE_DIR, "..", "mandi_rates.csv")
+MANDI_DATA = []
+if os.path.exists(MANDI_CSV_PATH):
+    with open(MANDI_CSV_PATH, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if not row.get("State"):  # skip blank rows
+                continue
+            MANDI_DATA.append({
+                "state": row["State"].strip(),
+                "district": row["District"].strip(),
+                "market": row["Market"].strip(),
+                "variety": row["Variety"].strip(),
+                "min_price": int(row["Min_Price_Rs_per_Quintal"]),
+                "max_price": int(row["Max_Price_Rs_per_Quintal"]),
+                "modal_price": int(row["Modal_Price_Rs_per_Quintal"]),
+            })
+    print(f"Mandi rates loaded: {len(MANDI_DATA)} entries")
+
 # ---------- Endpoints ----------
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "rag": bool(retriever), "llm": bool(llm)}
+
+
+@app.get("/api/mandi-rates")
+async def mandi_rates(request: Request):
+    state = request.query_params.get("state", "").strip()
+    district = request.query_params.get("district", "").strip()
+    variety = request.query_params.get("variety", "").strip()
+    search = request.query_params.get("search", "").strip().lower()
+
+    filtered = MANDI_DATA
+    if state:
+        filtered = [r for r in filtered if r["state"] == state]
+    if district:
+        filtered = [r for r in filtered if r["district"] == district]
+    if variety:
+        filtered = [r for r in filtered if r["variety"] == variety]
+    if search:
+        filtered = [r for r in filtered if search in r["market"].lower() or search in r["variety"].lower() or search in r["district"].lower()]
+
+    # Build unique filter options (based on current filtered data for cascading)
+    all_states = sorted(set(r["state"] for r in MANDI_DATA))
+    available_districts = sorted(set(r["district"] for r in (MANDI_DATA if not state else [r for r in MANDI_DATA if r["state"] == state])))
+    all_varieties = sorted(set(r["variety"] for r in MANDI_DATA))
+
+    return {
+        "data": filtered,
+        "filters": {
+            "states": all_states,
+            "districts": available_districts,
+            "varieties": all_varieties,
+        },
+        "total": len(filtered),
+    }
 
 
 @app.post("/api/speech-to-text")
