@@ -24,7 +24,7 @@
 }
 .drop-zone:hover {
   border-color: var(--green-500);
-  background: rgba(34,197,94,0.04);
+  background: rgba(34,197,94,0.03);
 }
 .drop-zone.has-preview {
   border-style: solid;
@@ -59,17 +59,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(10, 15, 13, 0.7);
+  background: var(--bg-overlay);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: calc(var(--radius-lg) - 2px);
   z-index: 5;
 }
 .upload-overlay p {
-  color: var(--green-300);
+  color: var(--green-600);
   font-size: 1.1rem;
   font-weight: 600;
   margin-top: 16px;
 }
+[data-theme="dark"] .upload-overlay p { color: var(--green-300); }
+
 .scan-animation {
   position: absolute;
   inset: 0;

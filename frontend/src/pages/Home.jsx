@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthProvider'
+import { useTheme } from '../context/ThemeProvider'
 import './Home.css'
 
 export default function Home() {
   const navigate = useNavigate()
   const { user, loading, signInWithGoogle, signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   function handleStartDiagnosis() {
     if (user) {
@@ -33,8 +35,8 @@ export default function Home() {
           <span>कृषि-सारथी</span>
         </div>
         <div className="nav-links">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How it Works</a>
+          <a href="#features">Features / सुविधाएं</a>
+          <a href="#how-it-works">कैसे काम करता है</a>
 
           {loading ? null : user ? (
             <div className="nav-user">
@@ -48,7 +50,7 @@ export default function Home() {
                 {user.user_metadata?.full_name || user.email}
               </span>
               <button className="nav-logout" onClick={signOut}>
-                Logout
+                बाहर निकलें
               </button>
             </div>
           ) : (
@@ -59,113 +61,128 @@ export default function Home() {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Sign in with Google
+              साइन इन करें / Sign In
             </button>
           )}
+          <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
         </div>
       </nav>
 
       <header className="hero">
-        <div className="hero-badge">🤖 AI-Powered Agricultural Assistant</div>
+        <div className="hero-badge">🤖 AI से चलने वाला खेती सहायक / AI-Powered Agricultural Assistant</div>
         <h1 className="hero-title">
           <span className="hero-hindi">कृषि-सारथी</span>
-          <span className="hero-sub">Krishi-Sarthi</span>
+          <span className="hero-sub">Krishi-Sarthi — आपका खेती साथी</span>
         </h1>
         <p className="hero-desc">
-          Voice-enabled, AI-powered crop disease diagnosis for Indian farmers.
-          Speak in Hindi, snap a photo — get instant treatment advice and nearby pesticide vendors.
+          हिंदी में बोलें, फसल की फोटो खींचें — तुरंत बीमारी पहचानें और इलाज पाएं।
+          <br />
+          <span className="hero-desc-en">
+            Speak in Hindi, snap a photo of your crop — get instant disease diagnosis, treatment advice, and nearby pesticide shops.
+          </span>
         </p>
         <div className="hero-buttons">
           <button className="btn-primary" onClick={handleStartDiagnosis}>
             <span className="btn-icon">{user ? '🔬' : '🔑'}</span>
-            {user ? 'Start Diagnosis' : 'Sign in to Start'}
+            {user ? 'जाँच शुरू करें / Start Diagnosis' : 'शुरू करें / Sign In'}
           </button>
           <button className="btn-secondary" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}>
             <span className="btn-icon">📖</span>
-            Learn More
+            और जानें / Learn More
           </button>
         </div>
         <div className="hero-stats">
           <div className="stat">
-            <span className="stat-value">30+</span>
-            <span className="stat-label">Crop Diseases</span>
+            <span className="stat-value">12</span>
+            <span className="stat-label">फसल रोग / Crop Diseases</span>
           </div>
           <div className="stat">
             <span className="stat-value">20+</span>
-            <span className="stat-label">Punjab Vendors</span>
+            <span className="stat-label">कीटनाशक दुकानें / Vendors</span>
           </div>
           <div className="stat">
-            <span className="stat-value">हिंदी</span>
-            <span className="stat-label">Voice Support</span>
+            <span className="stat-value">🎤</span>
+            <span className="stat-label">हिंदी आवाज़ / Hindi Voice</span>
           </div>
           <div className="stat">
             <span className="stat-value">&lt;5s</span>
-            <span className="stat-label">Diagnosis Time</span>
+            <span className="stat-label">जाँच समय / Diagnosis</span>
           </div>
         </div>
       </header>
 
       <section className="features" id="features">
-        <h2 className="section-title">Key Features</h2>
+        <h2 className="section-title">सुविधाएं / Key Features</h2>
         <div className="features-grid">
           <div className="feature-card">
             <div className="feature-icon">🎤</div>
-            <h3>Voice Input</h3>
-            <p>Speak in Hindi or English. Our Whisper AI transcribes and understands your crop problems.</p>
+            <h3>आवाज़ से पूछें / Voice Input</h3>
+            <p>हिंदी या English में बोलें। AI आपकी बात समझेगा और जवाब देगा।</p>
+            <p className="feature-en">Speak in Hindi or English — our AI understands your crop problems.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">📸</div>
-            <h3>Image Diagnosis</h3>
-            <p>Upload a photo of your crop. PyTorch AI classifies the disease with treatment advice.</p>
+            <h3>फोटो से जाँच / Image Diagnosis</h3>
+            <p>फसल की फोटो भेजें — AI बीमारी पहचान कर इलाज बताएगा।</p>
+            <p className="feature-en">Upload a crop photo — AI identifies the disease with treatment advice.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">💊</div>
-            <h3>Treatment Advice</h3>
-            <p>Get precise pesticide recommendations, dosages, and PAU-approved treatment plans.</p>
+            <h3>इलाज की सलाह / Treatment Advice</h3>
+            <p>सही दवाई, मात्रा, और छिड़काव का तरीका जानें।</p>
+            <p className="feature-en">Get precise pesticide recommendations, dosages, and approved treatment plans.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">📍</div>
-            <h3>Vendor Finder</h3>
-            <p>Find nearest pesticide shops with prices, phone numbers, and directions on map.</p>
+            <h3>नज़दीकी दुकान / Find Shops</h3>
+            <p>पास की कीटनाशक दुकानें ढूंढें — फोन नंबर, रास्ता, और कीमत।</p>
+            <p className="feature-en">Find nearest pesticide shops with phone numbers, prices, and directions.</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">🤖</div>
-            <h3>AI Chat Agent</h3>
-            <p>LangChain-powered agent that orchestrates tools to answer any farming question.</p>
+            <h3>AI चैट सहायक / AI Chat</h3>
+            <p>खेती से जुड़ा कोई भी सवाल पूछें — AI जवाब देगा।</p>
+            <p className="feature-en">Ask any farming question — the AI agent will answer it for you.</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">⚡</div>
-            <h3>n8n Automation</h3>
-            <p>Auto-notifications, expert escalation, and price aggregation via n8n workflows.</p>
+            <div className="feature-icon">📊</div>
+            <h3>मंडी भाव / Market Prices</h3>
+            <p>आज के मंडी भाव देखें — सब्ज़ी, अनाज, फल।</p>
+            <p className="feature-en">Check today's mandi rates for vegetables, grains, and fruits.</p>
           </div>
         </div>
       </section>
 
       <section className="how-it-works" id="how-it-works">
-        <h2 className="section-title">How It Works</h2>
+        <h2 className="section-title">कैसे काम करता है / How It Works</h2>
         <div className="steps">
           <div className="step">
             <div className="step-num">1</div>
-            <h3>Speak or Upload</h3>
-            <p>Record voice in Hindi or upload a crop photo</p>
+            <h3>बोलें या फोटो भेजें</h3>
+            <p className="step-hindi">हिंदी में बात करें या फसल की फोटो खींचें</p>
+            <p className="step-english">Speak in Hindi or upload a crop photo</p>
           </div>
           <div className="step-arrow">→</div>
           <div className="step">
             <div className="step-num">2</div>
-            <h3>AI Analysis</h3>
-            <p>Whisper + PyTorch + LangChain process your input</p>
+            <h3>AI जाँच करेगा</h3>
+            <p className="step-hindi">AI आपकी बात सुनेगा और फोटो देखेगा</p>
+            <p className="step-english">AI listens to you and analyzes your photo</p>
           </div>
           <div className="step-arrow">→</div>
           <div className="step">
             <div className="step-num">3</div>
-            <h3>Get Results</h3>
-            <p>Disease diagnosis, treatment, and vendor locations</p>
+            <h3>नतीजा और इलाज</h3>
+            <p className="step-hindi">बीमारी का नाम, दवाई, और दुकान का पता</p>
+            <p className="step-english">Disease name, medicine, and shop location</p>
           </div>
         </div>
       </section>
 
       <footer className="home-footer">
-        <p>Built for Smart India Hackathon · Krishi-Sarthi &copy; 2026</p>
+        <p>Smart India Hackathon के लिए बनाया गया · कृषि-सारथी / Krishi-Sarthi © 2026</p>
       </footer>
     </div>
   )

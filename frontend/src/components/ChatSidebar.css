@@ -5,10 +5,11 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: rgba(10, 15, 13, 0.95);
+  background: var(--bg-sidebar);
   border-right: 1px solid var(--border);
   height: 100%;
   overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
 /* ── Header ── */
@@ -24,9 +25,10 @@
 .sidebar-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--green-400);
+  color: var(--green-700);
   letter-spacing: -0.3px;
 }
+[data-theme="dark"] .sidebar-title { color: var(--green-400); }
 
 .sidebar-new-btn {
   width: 32px;
@@ -35,14 +37,14 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: rgba(34, 197, 94, 0.1);
+  background: var(--badge-bg);
   border: 1px solid var(--border);
   font-size: 0.9rem;
   transition: all var(--transition);
 }
 
 .sidebar-new-btn:hover {
-  background: rgba(34, 197, 94, 0.2);
+  background: var(--tab-hover-bg);
   border-color: var(--border-hi);
   transform: scale(1.05);
 }
@@ -68,13 +70,12 @@
 }
 
 .sidebar-session:hover {
-  background: rgba(34, 197, 94, 0.06);
+  background: var(--tab-hover-bg);
 }
 
 .sidebar-session.active {
-  background: rgba(34, 197, 94, 0.1);
+  background: var(--tab-active-bg);
   border-left-color: var(--green-500);
-  box-shadow: inset 0 0 24px rgba(34, 197, 94, 0.04);
 }
 
 /* ── Session Content ── */
@@ -101,8 +102,9 @@
 }
 
 .sidebar-session.active .session-name {
-  color: var(--green-300);
+  color: var(--green-700);
 }
+[data-theme="dark"] .sidebar-session.active .session-name { color: var(--green-300); }
 
 .session-time {
   font-size: 0.65rem;
@@ -150,11 +152,11 @@
 }
 
 .session-action:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--tab-hover-bg);
 }
 
 .session-action.delete:hover {
-  background: rgba(239, 83, 80, 0.12);
+  background: rgba(239, 83, 80, 0.1);
 }
 
 /* ── Rename Input ── */
@@ -163,7 +165,7 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text);
-  background: var(--bg-card);
+  background: var(--input-bg);
   border: 1px solid var(--green-500);
   border-radius: 6px;
   padding: 2px 8px;

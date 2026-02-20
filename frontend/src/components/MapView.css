@@ -10,7 +10,7 @@
   z-index: 1;
 }
 
-/* Leaflet overrides for dark theme */
+/* Leaflet overrides — theme aware */
 .leaflet-container {
   background: var(--bg-card) !important;
 }
@@ -36,8 +36,9 @@
   line-height: 1.5 !important;
 }
 .leaflet-popup-content strong {
-  color: var(--green-300);
+  color: var(--green-700);
 }
+[data-theme="dark"] .leaflet-popup-content strong { color: var(--green-300); }
 
 /* Custom marker pins */
 .user-marker, .vendor-marker {
@@ -46,5 +47,5 @@
 }
 .user-pin, .vendor-pin {
   font-size: 1.6rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTheme } from '../context/ThemeProvider'
 import useChatSessions from '../hooks/useChatSessions'
 import ChatSidebar from '../components/ChatSidebar'
 import ChatInterface from '../components/ChatInterface'
@@ -15,6 +16,7 @@ import './Dashboard.css'
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const { theme, toggleTheme } = useTheme()
   const [activeTab, setActiveTab] = useState('chat')
   const [diagnosis, setDiagnosis] = useState(null)
   const [vendors, setVendors] = useState([])
@@ -95,12 +97,12 @@ export default function Dashboard() {
         </div>
         <div className="dash-tabs">
           {[
-            { id: 'chat', icon: '💬', label: 'Chat' },
-            { id: 'voice', icon: '🎤', label: 'Voice' },
-            { id: 'camera', icon: '📸', label: 'Scan' },
-            { id: 'results', icon: '🔬', label: 'Results' },
-            { id: 'vendors', icon: '📍', label: 'Vendors' },
-            { id: 'market', icon: '🏪', label: 'Market' },
+            { id: 'chat', icon: '💬', label: 'Chat', hindi: 'चैट' },
+            { id: 'voice', icon: '🎤', label: 'Voice', hindi: 'आवाज़' },
+            { id: 'camera', icon: '📸', label: 'Scan', hindi: 'स्कैन' },
+            { id: 'results', icon: '🔬', label: 'Results', hindi: 'नतीजे' },
+            { id: 'vendors', icon: '📍', label: 'Vendors', hindi: 'दुकानें' },
+            { id: 'market', icon: '🏪', label: 'Market', hindi: 'मंडी' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -109,9 +111,13 @@ export default function Dashboard() {
             >
               <span className="tab-icon">{tab.icon}</span>
               <span className="tab-label">{tab.label}</span>
+              <span className="tab-hindi">{tab.hindi}</span>
             </button>
           ))}
         </div>
+        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
       </nav>
 
       <div className="dash-body">

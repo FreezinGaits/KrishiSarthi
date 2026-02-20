@@ -85,10 +85,10 @@
   width: 100%;
   max-width: 500px;
   padding: 18px 22px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px);
+  background: var(--bg-card);
   border: 1px solid var(--border-hi);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
   animation: msg-in 0.35s ease;
 }
 .transcript-label {
